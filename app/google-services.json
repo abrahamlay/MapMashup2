@@ -1,0 +1,87 @@
+{
+  "project_info": {
+    "project_number": "657179951689",
+    "project_id": "mapmashup2"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:657179951689:android:bcb78c2359b093a8",
+        "android_client_info": {
+          "package_name": "com.dev.abrahamlay.mapmashup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "657179951689-ps9ol8cn2jdlu4ki7puejavmbnjm1smo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dev.abrahamlay.mapmashup",
+            "certificate_hash": "BD9A323232F8FE74E4ADCA94ED416DC97FD4716B"
+          }
+        },
+        {
+          "client_id": "657179951689-mponn8eppn1j5q104qrbo443ovko6j0l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5d-4WtnereeOaXSpPBtDS3RRgaRpO128"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:657179951689:android:6a911c33e4787054",
+        "android_client_info": {
+          "package_name": "com.dev.abrahamlay.mapmashup2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "657179951689-1ia2svjuadpg2uibromqc9jvio24eab4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dev.abrahamlay.mapmashup2",
+            "certificate_hash": "BD9A323232F8FE74E4ADCA94ED416DC97FD4716B"
+          }
+        },
+        {
+          "client_id": "657179951689-mponn8eppn1j5q104qrbo443ovko6j0l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5d-4WtnereeOaXSpPBtDS3RRgaRpO128"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
