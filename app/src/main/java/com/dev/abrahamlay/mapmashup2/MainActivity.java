@@ -1,8 +1,8 @@
 package com.dev.abrahamlay.mapmashup2;
 
+import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -11,20 +11,20 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.dev.abrahamlay.mapmashup2.util.GPSTracker;
-import com.dev.abrahamlay.mapmashup2.util.JSONParser;
 import com.dev.abrahamlay.mapmashup2.util.MarkerData;
+import com.dev.abrahamlay.mapmashup2.util.NetworkSingleton;
 import com.dev.abrahamlay.mapmashup2.util.ServiceHandler;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
@@ -35,19 +35,27 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements OnMapReadyCallback,NavigationView.OnNavigationItemSelectedListener,
-        GoogleApiClient.OnConnectionFailedListener ,View.OnClickListener{
-
-
+        implements OnMapReadyCallback,
+        NavigationView.OnNavigationItemSelectedListener,
+        View.OnClickListener,
+        GoogleMap.OnInfoWindowClickListener,
+        GoogleMap.OnMarkerClickListener {
+//    ProgressDialog pDialog;
+    String url = "http://abrahamlay.esy.es/mapmashupservice/getPlaceList.php";
     private GoogleMap mMap;
     private GPSTracker gps;
     private double latitude;
     private double longitude;
+    private Marker marker;
+    private List<Marker> mMarker;
+    ServiceHandler service=new ServiceHandler();
+
 
     private TextView displayName;
     private ImageView photo;
@@ -55,12 +63,18 @@ public class MainActivity extends AppCompatActivity
     private Button logout;
 
     String TAG="MainActivity";
+    private List<MarkerData> markers;
+    private UploadsListFragment.Callbacks mCallbacks;
+
+//    private Hashtable<String,String> markers = new Hashtable<String, String>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         autocomplete();
 
+//        ensureLoader();
         googlemaps();
         fabButton();
         navigationdrawer();
@@ -70,6 +84,12 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+//    private void ensureLoader() {
+//        if (mImageLoader == null) {
+//            // Get the ImageLoader through your singleton class.
+//            mImageLoader = NetworkSingleton.getInstance(this).getImageLoader();
+//        }
+//    }
     private void googlemaps() {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -164,28 +184,12 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
+//    @Override
+//    public ImageLoader onGetImageLoader() {
+//        ensureLoader();
+//        return mImageLoader;
+//    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -212,26 +216,9 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
-    }
 
-//    private void showProgressDialog() {
-//        if (mProgressDialog == null) {
-//            mProgressDialog = new ProgressDialog(this);
-//            mProgressDialog.setMessage(getString(R.string.loading));
-//            mProgressDialog.setIndeterminate(true);
-//        }
-//
-//        mProgressDialog.show();
-//    }
-//
-//    private void hideProgressDialog() {
-//        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-//            mProgressDialog.hide();
-//        }
-//    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -251,32 +238,15 @@ public class MainActivity extends AppCompatActivity
         // create class object
         gps = new GPSTracker(MainActivity.this);
 
-        ServiceHandler service= new ServiceHandler();
-
-        service.GetData("http://abrahamlay.esy.es/mapmashupservice/getPlaceList.php");
-//        String data = null;
-//        try {
-//            data = service.GetData("http://abrahamlay.esy.es/mapmashupservice/getPlaceList.php");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
 
+        service.GetJsonMarkerData(url,TAG,MainActivity.this,mMap);
 
-        String data="{\"tempatwisata\":[{\"kodeTempatWisata\":\"1\",\"namaTempatWisata\":\"Gunung Bromo\",\"rating\":\"3\",\"Longitude\":\"-7.942092\",\"Latitude\":\"112.812924\",\"linkVideo\":\"n5N4eKT0UIw\",\"namaJenis\":\"Gunung\"}]}";
-        JSONParser jsonparsing= new JSONParser();
-        Log.d(TAG,"JSON: "+data);
+        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
 
-        List<MarkerData> marker=jsonparsing.getMarker(data);
-        for(int i=0;i<marker.size();i++){
-            LatLng region = new LatLng(marker.get(i).getLongitude(), marker.get(i).getLatitude());
-            Log.d(TAG,"Marker pos :"+marker.get(i).getLongitude()+","+marker.get(i).getLatitude());
-            mMap.addMarker(new MarkerOptions()
-                    .position(region)
-                    .title(marker.get(i).getNamaTempatWisata()+" " + marker.get(i).getLatitude() + "," + marker.get(i).getLongitude())
-            );
 
-        }
+//        String data="{\"tempatwisata\":[{\"kodeTempatWisata\":\"1\",\"namaTempatWisata\":\"Gunung Bromo\",\"rating\":\"3\",\"Longitude\":\"-7.942092\",\"Latitude\":\"112.812924\",\"linkVideo\":\"n5N4eKT0UIw\",\"namaJenis\":\"Gunung\"}]}";
+
         // check if GPS enabled
         if (gps.canGetLocation()) {
 
@@ -286,6 +256,8 @@ public class MainActivity extends AppCompatActivity
             // Add a marker in Sydney, Australia, and move the camera.
             LatLng region = new LatLng(latitude, longitude);
             Log.d(TAG,"Marker GPS pos :"+latitude+","+longitude);
+
+
 
             mMap.addMarker(new MarkerOptions()
                     .position(region)
@@ -300,5 +272,76 @@ public class MainActivity extends AppCompatActivity
             // Ask user to enable GPS/network in settings
             gps.showSettingsAlert();
         }
+        mMap.setOnMarkerClickListener(this);
+        mMap.setOnInfoWindowClickListener(this);
     }
-}
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Toast.makeText(this, "Click Info Window : "+marker.getTitle(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        return false;
+    }
+
+    private class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter{
+        private View view;
+        private ImageLoader mImageLoader;
+
+        public CustomInfoWindowAdapter(){
+            mImageLoader=null;
+            view=getLayoutInflater().inflate(R.layout.custom_info_marker,null);
+        }
+
+
+
+        @Override
+        public View getInfoContents(Marker marker) {
+            if (MainActivity.this.marker != null
+                    && MainActivity.this.marker.isInfoWindowShown()) {
+                MainActivity.this.marker.hideInfoWindow();
+                MainActivity.this.marker.showInfoWindow();
+            }
+            return null;
+        }
+
+
+        @Override
+        public View getInfoWindow(Marker marker) {
+            MainActivity.this.marker = marker;
+             NetworkImageView image=(NetworkImageView) view.findViewById(R.id.thumbnailMarker);
+
+            // Get the ImageLoader through your singleton class.
+            mImageLoader = NetworkSingleton.getInstance(view.getContext()).getImageLoader();
+
+            final TextView titleUi = (TextView) view.findViewById(R.id.titleMarker);
+//            final TextView snippetUi = (TextView) view.findViewById(R.id.snippetMarker);
+            String thumburl=service.getThumbUrl();
+//            String thumburl=null;
+
+                    if(thumburl!=null){
+
+                        image.setImageUrl(thumburl, mImageLoader);
+                    } else {
+                        image.setImageResource(R.drawable.ic_menu_slideshow);
+                    }
+
+                    if (marker.getTitle()!=null){
+                        titleUi.setText(marker.getTitle());
+                    }else{
+                        titleUi.setText("Unknown Title");
+                    }
+//                    if (marker.getSnippet()!=null){
+//                        snippetUi.setText(marker.getSnippet());
+//                    }else{
+//                        snippetUi.setText("Unknown Snippet");
+//                    }
+                return view;
+                }
+            }
+
+        }
+
+
