@@ -31,13 +31,20 @@ public class ServiceHandler {
 //    RequestQueue queue;
   List<MarkerData> markerDataList=new ArrayList<MarkerData>();
     List<Marker> markerList= new ArrayList<Marker>();
-   String ThumbUrl=null;
+   HashMap<String,String>ThumbUrl= new HashMap<>();
+    HashMap<String,String>YouTubeID= new HashMap<>();
+    String imgYoutube="https://img.youtube.com/vi/";
+    String imgQuality="/mqdefault.jpg";
     public List<MarkerData> getMarkerDataList() {
         return markerDataList;
     }
 
-    public String getThumbUrl() {
-        return ThumbUrl;
+    public String getThumbUrl(String MarkerID) {
+        return ThumbUrl.get(MarkerID);
+    }
+
+    public String getYouTubeID(String MarkerID) {
+        return YouTubeID.get(MarkerID);
     }
 
     public void GetJsonMarkerData(String dataUrl, final String TAG, final Context context, final GoogleMap mMap){
@@ -66,9 +73,10 @@ public class ServiceHandler {
                Toast.makeText(context,error.getMessage(),Toast.LENGTH_LONG).show();
            }
        });
-       RequestQueue requestQueue = Volley.newRequestQueue(context);
-
-       requestQueue.add(jsonObjReq);
+       NetworkSingleton requestQueue = NetworkSingleton.getInstance(context);
+        requestQueue.getRequestQueue();
+        // Add a request (in this example, called stringRequest) to your RequestQueue.
+        requestQueue.addToRequestQueue(jsonObjReq);
    }
 
     public List<Marker> parsingToMarker(List<MarkerData> marker,String TAG, GoogleMap mMap){
@@ -76,14 +84,19 @@ public class ServiceHandler {
         for (int i=0;i<marker.size();i++) {
             LatLng region = new LatLng(marker.get(i).getLongitude(), marker.get(i).getLatitude());
             Log.d(TAG, "Marker pos :" + marker.get(i).getLongitude() + "," + marker.get(i).getLatitude());
-            String thumbvideo = "https://img.youtube.com/vi/" + marker.get(i).getLinkVideo() + "/mqdefault.jpg";
-            marker.get(i).setLinkVideo(thumbvideo);
+
             Marker mMarker = mMap.addMarker(new MarkerOptions()
                     .position(region)
                     .title(marker.get(i).getNamaTempatWisata())
+                    .snippet(Float.toString(marker.get(i).getRating()))
+                    .flat(true)
             );
-            ThumbUrl=marker.get(i).getLinkVideo();
-//            mMarker.showInfoWindow();
+
+            YouTubeID.put(mMarker.getId(),marker.get(i).getLinkVideo());
+            String thumbvideo = imgYoutube + marker.get(i).getLinkVideo() +imgQuality ;
+            marker.get(i).setLinkVideo(thumbvideo);
+                ThumbUrl.put(mMarker.getId(),marker.get(i).getLinkVideo());
+            mMarker.showInfoWindow();
             markerList.add(mMarker);
 
 
@@ -123,8 +136,9 @@ public class ServiceHandler {
             }
 
         };
-        RequestQueue requestQueue = Volley.newRequestQueue(context);
-        requestQueue.add(jsonObjReq);
-
+        NetworkSingleton requestQueue = NetworkSingleton.getInstance(context);
+        requestQueue.getRequestQueue();
+        // Add a request (in this example, called stringRequest) to your RequestQueue.
+        requestQueue.addToRequestQueue(jsonObjReq);
     }
 }

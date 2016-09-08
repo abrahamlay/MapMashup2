@@ -1,30 +1,27 @@
 package com.dev.abrahamlay.mapmashup2;
 
-import android.app.Application;
+import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.dev.abrahamlay.mapmashup2.util.GPSTracker;
-import com.dev.abrahamlay.mapmashup2.util.MarkerData;
 import com.dev.abrahamlay.mapmashup2.util.NetworkSingleton;
 import com.dev.abrahamlay.mapmashup2.util.ServiceHandler;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
@@ -34,66 +31,56 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.util.List;
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerFragment;
 
 public class MainActivity extends AppCompatActivity
         implements OnMapReadyCallback,
-        NavigationView.OnNavigationItemSelectedListener,
         View.OnClickListener,
         GoogleMap.OnInfoWindowClickListener,
-        GoogleMap.OnMarkerClickListener {
-//    ProgressDialog pDialog;
+        GoogleMap.OnMarkerClickListener,
+        YouTubePlayer.PlayerStateChangeListener,
+        YouTubePlayer.OnFullscreenListener {
+    //    ProgressDialog pDialog;
     String url = "http://abrahamlay.esy.es/mapmashupservice/getPlaceList.php";
     private GoogleMap mMap;
     private GPSTracker gps;
     private double latitude;
     private double longitude;
     private Marker marker;
-    private List<Marker> mMarker;
-    ServiceHandler service=new ServiceHandler();
+    ServiceHandler service = new ServiceHandler();
+    String TAG = "MainActivity";
 
+    public ImageLoader mImageLoader;
 
-    private TextView displayName;
-    private ImageView photo;
-    private SignInButton login;
-    private Button logout;
-
-    String TAG="MainActivity";
-    private List<MarkerData> markers;
-    private UploadsListFragment.Callbacks mCallbacks;
-
-//    private Hashtable<String,String> markers = new Hashtable<String, String>();
+    private static final String YOUTUBE_FRAGMENT_TAG = "youtube";
+    private boolean mIsFullScreen=false;
+    private Toolbar mActionBarToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mActionBarToolbar);
+        getSupportActionBar().setTitle(R.string.app_name);
         autocomplete();
 
-//        ensureLoader();
         googlemaps();
         fabButton();
-        navigationdrawer();
-
-
-//        GoogleSignIn(savedInstanceState);
 
     }
 
-//    private void ensureLoader() {
-//        if (mImageLoader == null) {
-//            // Get the ImageLoader through your singleton class.
-//            mImageLoader = NetworkSingleton.getInstance(this).getImageLoader();
-//        }
-//    }
     private void googlemaps() {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
     }
 
     private void autocomplete() {
@@ -126,119 +113,59 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    private void setup(NavigationView navigationView) {
-        View header = navigationView.getHeaderView(0);
-
-        displayName = (TextView) header.findViewById(R.id.status);
-//        email = (TextView) header.findViewById(R.id.email);
-        photo = (ImageView) header.findViewById(R.id.ProfilPicture);
-
-        // Button listeners
-        login = (SignInButton) header.findViewById(R.id.sign_in_button);
-        logout = (Button) header.findViewById(R.id.sign_out_button);
-    }
-
-
-
-    private void navigationdrawer() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        setup(navigationView);
-    }
-
-    private void fabButton(){
+    private void fabButton() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                if (Accountname!=null) {
-                    Intent intent = new Intent(getApplicationContext(), VideoListActivity.class);
-//                    intent.putExtra("Account", Accountname);
-////                intent.putExtra("displayName",name);
-                    startActivity(intent);
-//                }else{
-//                    signIn();
-//                }
+                Intent intent = new Intent(getApplicationContext(), VideoListActivity.class);
+                startActivity(intent);
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
             }
         });
     }
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-//    @Override
-//    public ImageLoader onGetImageLoader() {
-//        ensureLoader();
-//        return mImageLoader;
-//    }
-
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-//        // Handle navigation view item clicks here.
-//        int id = item.getItemId();
-//
-//        if (id == R.id.nav_camera) {
-//            // Handle the camera action
-//        } else if (id == R.id.nav_gallery) {
-//
-//        } else if (id == R.id.nav_slideshow) {
-//
-//        } else if (id == R.id.nav_manage) {
-//
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
-//        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-
-
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.sign_in_button:
-//                chooseAccount();
-                break;
-            case R.id.sign_out_button:
-//                chooseAccount();
-                break;
-        }
+//        switch (v.getId()) {
+////            case R.id.sign_in_button:
+////                chooseAccount();
+//                break;
+////            case R.id.sign_out_button:
+////                chooseAccount();
+//                break;
+//        }
     }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-//        View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.video_list_item, null);
-        // create class object
-        gps = new GPSTracker(MainActivity.this);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
 
+        }
+        mMap.setMyLocationEnabled(true);
 
+//        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+//        new GoogleMap.OnMyLocationButtonClickListener() {
+//
+//            @Override
+//            public boolean onMyLocationButtonClick() {
+//
+//                return false;
+//            }
+//        };
 
         service.GetJsonMarkerData(url,TAG,MainActivity.this,mMap);
 
@@ -247,24 +174,17 @@ public class MainActivity extends AppCompatActivity
 
 //        String data="{\"tempatwisata\":[{\"kodeTempatWisata\":\"1\",\"namaTempatWisata\":\"Gunung Bromo\",\"rating\":\"3\",\"Longitude\":\"-7.942092\",\"Latitude\":\"112.812924\",\"linkVideo\":\"n5N4eKT0UIw\",\"namaJenis\":\"Gunung\"}]}";
 
+        gps = new GPSTracker(MainActivity.this);
         // check if GPS enabled
         if (gps.canGetLocation()) {
 
             latitude = gps.getLatitude();
             longitude = gps.getLongitude();
 
-            // Add a marker in Sydney, Australia, and move the camera.
             LatLng region = new LatLng(latitude, longitude);
             Log.d(TAG,"Marker GPS pos :"+latitude+","+longitude);
-
-
-
-            mMap.addMarker(new MarkerOptions()
-                    .position(region)
-                    .title("Kota X /n" + latitude + "," + longitude)
-            );
             mMap.moveCamera(CameraUpdateFactory.newLatLng(region));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
 
         } else {
             // can't get location
@@ -272,33 +192,85 @@ public class MainActivity extends AppCompatActivity
             // Ask user to enable GPS/network in settings
             gps.showSettingsAlert();
         }
+
+
+
         mMap.setOnMarkerClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
     }
 
+
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Toast.makeText(this, "Click Info Window : "+marker.getTitle(), Toast.LENGTH_SHORT).show();
+       String youtubeID = service.getYouTubeID(marker.getId());
+        ViewVideo(youtubeID);
+        Toast.makeText(this, "Video Play : "+marker.getTitle()+" "+youtubeID, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+
         return false;
     }
 
-    private class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter{
-        private View view;
-        private ImageLoader mImageLoader;
+    @Override
+    public void onFullscreen(boolean b) {
+        mIsFullScreen = b;
+    }
 
-        public CustomInfoWindowAdapter(){
-            mImageLoader=null;
-            view=getLayoutInflater().inflate(R.layout.custom_info_marker,null);
+    @Override
+    public void onLoading() {
+
+    }
+
+    @Override
+    public void onLoaded(String s) {
+
+    }
+
+    @Override
+    public void onAdStarted() {
+
+    }
+
+    @Override
+    public void onVideoStarted() {
+
+    }
+
+    @Override
+    public void onVideoEnded() {
+
+    }
+
+    @Override
+    public void onError(YouTubePlayer.ErrorReason errorReason) {
+        showErrorToast(errorReason.toString());
+    }
+
+
+    private class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+//        private final LinearLayout mLinearLayout;
+        private  View view;
+
+        private NetworkImageView image;
+
+        public CustomInfoWindowAdapter() {
+//            Get the ImageLoader through your singleton class.
+            mImageLoader = NetworkSingleton.getInstance(getApplicationContext()).getImageLoader();
+            view = getLayoutInflater().inflate(R.layout.custom_info_marker,null );
         }
-
 
 
         @Override
         public View getInfoContents(Marker marker) {
+
+            return contentCustomMarker(marker);
+        }
+
+
+        @Override
+        public View getInfoWindow(Marker marker) {
             if (MainActivity.this.marker != null
                     && MainActivity.this.marker.isInfoWindowShown()) {
                 MainActivity.this.marker.hideInfoWindow();
@@ -307,41 +279,82 @@ public class MainActivity extends AppCompatActivity
             return null;
         }
 
-
-        @Override
-        public View getInfoWindow(Marker marker) {
+        private View contentCustomMarker(Marker marker) {
             MainActivity.this.marker = marker;
-             NetworkImageView image=(NetworkImageView) view.findViewById(R.id.thumbnailMarker);
+            String youtubeID = service.getYouTubeID(marker.getId());
 
-            // Get the ImageLoader through your singleton class.
-            mImageLoader = NetworkSingleton.getInstance(view.getContext()).getImageLoader();
-
+//
+            image=(NetworkImageView) view.findViewById(R.id.thumbnail);
             final TextView titleUi = (TextView) view.findViewById(R.id.titleMarker);
-//            final TextView snippetUi = (TextView) view.findViewById(R.id.snippetMarker);
-            String thumburl=service.getThumbUrl();
+            final TextView snippetUi = (TextView) view.findViewById(R.id.snippetMarker);
+            String thumburl=service.getThumbUrl(marker.getId());
+//            Log.d(TAG,thumburl);
 //            String thumburl=null;
 
+
                     if(thumburl!=null){
-
                         image.setImageUrl(thumburl, mImageLoader);
-                    } else {
-                        image.setImageResource(R.drawable.ic_menu_slideshow);
+                    }else {
+                        image.setImageDrawable(null);
                     }
-
-                    if (marker.getTitle()!=null){
+                    if (marker.getTitle() != null) {
                         titleUi.setText(marker.getTitle());
-                    }else{
+                    } else {
                         titleUi.setText("Unknown Title");
                     }
-//                    if (marker.getSnippet()!=null){
-//                        snippetUi.setText(marker.getSnippet());
-//                    }else{
-//                        snippetUi.setText("Unknown Snippet");
-//                    }
-                return view;
-                }
-            }
-
+                    if (marker.getSnippet() != null) {
+                        snippetUi.setText("Rating :" + marker.getSnippet() + " " + youtubeID);
+                    } else {
+                        snippetUi.setText("Unknown Snippet");
+                    }
+            return view;
         }
+
+    }
+
+    public void ViewVideo(final String youtubeId) {
+        YouTubePlayerFragment playerFragment = YouTubePlayerFragment
+                .newInstance();
+
+
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.video_box, playerFragment,
+                        YOUTUBE_FRAGMENT_TAG)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                .commit();
+        playerFragment.initialize(Auth.KEY,
+                new YouTubePlayer.OnInitializedListener() {
+                    public YouTubePlayer mYouTubePlayer;
+
+                    @Override
+                    public void onInitializationSuccess(
+                            YouTubePlayer.Provider provider,
+                            YouTubePlayer youTubePlayer, boolean b) {
+                        youTubePlayer.setFullscreenControlFlags(YouTubePlayer.FULLSCREEN_FLAG_CUSTOM_LAYOUT);
+                        youTubePlayer.cueVideo(youtubeId);
+                        mYouTubePlayer = youTubePlayer;
+                        youTubePlayer
+                                .setPlayerStateChangeListener(MainActivity.this);
+                        youTubePlayer
+                                .setOnFullscreenListener(MainActivity.this);
+
+                    }
+
+                    @Override
+                    public void onInitializationFailure(
+                            YouTubePlayer.Provider provider,
+                            YouTubeInitializationResult result) {
+                        showErrorToast(result.toString());
+                    }
+                });
+    }
+    private void showErrorToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT)
+                .show();
+    }
+
+
+}
 
 

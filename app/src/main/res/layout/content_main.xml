@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,30 +7,31 @@
 
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.dev.abrahamlay.mapmashup2.MainActivity"
-    tools:showIn="@layout/app_bar_main">
+    tools:showIn="@layout/activity_main"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <fragment
+        android:id="@+id/place_autocomplete_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:name="com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment"
+        />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/video_box"></FrameLayout>
+
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:id="@+id/map"
+        tools:context=".MapsActivity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        >
-        <fragment
-            android:id="@+id/place_autocomplete_fragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:name="com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment"
+        android:layout_weight="0.5">
+    </fragment>
 
-            />
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:id="@+id/map"
-            tools:context=".MapsActivity"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
-        </fragment>
-
-    </LinearLayout>
-</RelativeLayout>
+</LinearLayout>

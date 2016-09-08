@@ -49,4 +49,6 @@
 
     <string name="title_pick_video">Pick your video</string>
     <string name="debug_key">AIzaSyD5d-4WtnereeOaXSpPBtDS3RRgaRpO128</string>
+    <string name="error_player">There was an error initializing the YouTubePlayer (%1$s)</string>
+    <string name="title_activity_main2">Main2Activity</string>
 </resources>
