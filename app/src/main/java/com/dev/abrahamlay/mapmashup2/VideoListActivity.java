@@ -3,6 +3,7 @@ package com.dev.abrahamlay.mapmashup2;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,10 +22,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.dev.abrahamlay.mapmashup2.util.NetworkSingleton;
+import com.dev.abrahamlay.mapmashup2.util.ServiceHandler;
 import com.dev.abrahamlay.mapmashup2.util.Upload;
 import com.dev.abrahamlay.mapmashup2.util.Utils;
 import com.dev.abrahamlay.mapmashup2.util.VideoData;
@@ -59,7 +60,7 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
     public static final String MESSAGE_KEY = "message";
     public static final String YOUTUBE_ID = "youtubeId";
     public static final String YOUTUBE_WATCH_URL_PREFIX = "http://www.youtube.com/watch?v=";
-    static final String REQUEST_AUTHORIZATION_INTENT = "com.google.example.yt.RequestAuth";
+    static final String REQUEST_AUTHORIZATION_INTENT = "com.dev.abrahamlay.RequestAuth";
     static final String REQUEST_AUTHORIZATION_INTENT_PARAM = "com.google.example.yt.RequestAuth.param";
     private static final int REQUEST_GOOGLE_PLAY_SERVICES = 0;
     private static final int REQUEST_GMS_ERROR_DIALOG = 1;
@@ -69,6 +70,8 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
     private static final int RESULT_VIDEO_CAP = 5;
     private static final int REQUEST_DIRECT_TAG = 6;
     private static final String TAG = "VideoListActivity";
+
+    private static final String url="http://abrahamlay.esy.es/mapmashupservice/newTag.php";
     final HttpTransport transport = AndroidHttp.newCompatibleTransport();
     final JsonFactory jsonFactory = new GsonFactory();
     GoogleAccountCredential credential;
@@ -78,18 +81,15 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
     private VideoData mVideoData;
     private UploadBroadcastReceiver broadcastReceiver;
     private UploadsListFragment mUploadsListFragment;
+    ProgressDialog progress;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
 
         mUploadsListFragment = new UploadsListFragment(getApplicationContext());
-
-
             setContentView(R.layout.activity_video_list);
-
             ensureLoader();
-
             credential = GoogleAccountCredential.usingOAuth2(
                     getApplicationContext(), Arrays.asList(Auth.SCOPES));
             // set exponential backoff policy
@@ -100,12 +100,9 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
             } else {
                 loadAccount();
             }
-
             credential.setSelectedAccountName(mChosenAccountName);
-
             mUploadsListFragment = (UploadsListFragment) getFragmentManager()
                     .findFragmentById(R.id.list_fragment);
-
 
     }
 
@@ -140,6 +137,8 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(this);
         sp.edit().putString(ACCOUNT_KEY, mChosenAccountName).commit();
+
+
     }
 
     private void loadData() {
@@ -237,15 +236,19 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
                 if (resultCode == Activity.RESULT_OK && data != null
                         && data.getExtras() != null) {
                     String youtubeId = data.getStringExtra(YOUTUBE_ID);
+                    String nama = data.getExtras().getString(TagLocationActivity.nodeNama);
+                    long jenis = data.getExtras().getLong(TagLocationActivity.nodeKodeJenis);
+                    double longitude = data.getExtras().getDouble(TagLocationActivity.nodeLongitude);
+                    double latitude =data.getExtras().getDouble(TagLocationActivity.nodeLatitude);
                     if (youtubeId.equals(mVideoData.getYouTubeId())) {
-                        directTag(mVideoData);
+                        directTag(mVideoData,nama,jenis,longitude,latitude,mChosenAccountName);
                     }
                 }
                 break;
         }
     }
 
-    private void directTag(final VideoData video) {
+    private void directTag(final VideoData video, String nama, long jenis, double longitude, double latitude, String mAccount) {
         final Video updateVideo = new Video();
         VideoSnippet snippet = video
                 .addTags(Arrays.asList(
@@ -272,9 +275,13 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
             }
 
         }.execute((Void) null);
-        Toast.makeText(this,
-                R.string.video_submitted_to_ytdl, Toast.LENGTH_LONG)
-                .show();
+
+        ServiceHandler sc= new ServiceHandler();
+        sc.PostTempatWisataData(url,TAG,VideoListActivity.this,nama,jenis,longitude,latitude,mAccount,video.getYouTubeId());
+        Log.d(TAG,"Lokasi :"+nama+" "+jenis+" "+longitude+" "+latitude+" "+mAccount+" "+video.getYouTubeId());
+//        Toast.makeText(this,
+//                R.string.video_submitted_to_ytdl, Toast.LENGTH_LONG)
+//                .show();
     }
 
     @Override
@@ -289,9 +296,15 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
         }
 
         setProgressBarIndeterminateVisibility(true);
+        progress = new ProgressDialog(this);
+        progress.setMessage(getString(R.string.loading_video));
+        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progress.setIndeterminate(true);
+        progress.show();
         new AsyncTask<Void, Void, List<VideoData>>() {
             @Override
             protected List<VideoData> doInBackground(Void... voids) {
+
 
                 YouTube youtube = new YouTube.Builder(transport, jsonFactory,
                         credential).setApplicationName(Constants.APP_NAME)
@@ -376,11 +389,13 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
             @Override
             protected void onPostExecute(List<VideoData> videos) {
                 setProgressBarIndeterminateVisibility(false);
-
-                if (videos == null) {
-                    return;
+                if (progress.isShowing()) {
+                    progress.setIndeterminate(false);
+                  progress.dismiss();
+                    if (videos == null) {
+                        return;
+                    }
                 }
-
                 mUploadsListFragment.setVideos(videos);
             }
 

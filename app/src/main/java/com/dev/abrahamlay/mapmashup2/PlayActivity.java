@@ -1,5 +1,6 @@
 package com.dev.abrahamlay.mapmashup2;
 
+import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +10,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dev.abrahamlay.mapmashup2.util.VideoData;
@@ -21,7 +24,8 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 
-public class PlayActivity extends AppCompatActivity implements YouTubePlayer.PlayerStateChangeListener, YouTubePlayer.OnFullscreenListener {
+public class PlayActivity extends AppCompatActivity implements YouTubePlayer.PlayerStateChangeListener,
+        YouTubePlayer.OnFullscreenListener{
 
     private static final String YOUTUBE_FRAGMENT_TAG = "youtube";
     final HttpTransport transport = AndroidHttp.newCompatibleTransport();
@@ -30,6 +34,22 @@ public class PlayActivity extends AppCompatActivity implements YouTubePlayer.Pla
     private YouTubePlayer mYouTubePlayer;
     private boolean mIsFullScreen = false;
     private Intent intent;
+
+    private String TAG="PlayActivity";
+    private static final int REQUEST_TAG_LOCATION=10;
+    private TextView reviewNama;
+    private TextView reviewJenis;
+    private LinearLayout location;
+    private LinearLayout position;
+    private LinearLayout reviewTagLocation;
+    private TextView reviewLongitude;
+    private TextView reviewLatitude;
+    private TextView reviewTrigger;
+    private String nama;
+    private String jenis;
+    private double latitude;
+    private double longitude;
+    private long kodeJenis;
 
     public PlayActivity() {
     }
@@ -46,6 +66,11 @@ public class PlayActivity extends AppCompatActivity implements YouTubePlayer.Pla
     }
 
     public void directLite(View view) {
+        intent.putExtra(TagLocationActivity.nodeNama,nama);
+        intent.putExtra(TagLocationActivity.nodeKodeJenis,kodeJenis);
+        intent.putExtra(TagLocationActivity.nodeJenis,jenis);
+        intent.putExtra(TagLocationActivity.nodeLongitude,longitude);
+        intent.putExtra(TagLocationActivity.nodeLatitude,latitude);
         this.setResult(RESULT_OK, intent);
         finish();
     }
@@ -135,7 +160,9 @@ public class PlayActivity extends AppCompatActivity implements YouTubePlayer.Pla
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        getActionBar().setDisplayHomeAsUpEnabled(true);
+
         setContentView(R.layout.activity_play);
+        setupReview();
         intent = getIntent();
         Button submitButton = (Button) findViewById(R.id.submit_button);
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
@@ -144,7 +171,11 @@ public class PlayActivity extends AppCompatActivity implements YouTubePlayer.Pla
         }
         String youtubeId = intent.getStringExtra(VideoListActivity.YOUTUBE_ID);
         panToVideo(youtubeId);
+
     }
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -168,6 +199,55 @@ public class PlayActivity extends AppCompatActivity implements YouTubePlayer.Pla
     public void onBackPressed() {
         super.onBackPressed();
         NavUtils.navigateUpFromSameTask(this);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode){
+            case REQUEST_TAG_LOCATION:
+                if (resultCode == Activity.RESULT_OK && data != null
+                        && data.getExtras() != null) {
+                    location.setVisibility(View.VISIBLE);
+                    position.setVisibility(View.VISIBLE);
+
+                    reviewTrigger.setText("My Location :");
+                    nama=data.getExtras().getString(TagLocationActivity.nodeNama);
+                    jenis=data.getExtras().getString(TagLocationActivity.nodeJenis);
+                    kodeJenis=data.getExtras().getLong(TagLocationActivity.nodeKodeJenis);
+                    longitude=data.getExtras().getDouble(TagLocationActivity.nodeLongitude);
+                    latitude =data.getExtras().getDouble(TagLocationActivity.nodeLatitude);
+
+                    reviewNama.setText(nama);
+                    reviewJenis.setText(jenis);
+                    reviewLongitude.setText(String.valueOf(longitude));
+                    reviewLatitude.setText(String.valueOf(latitude));
+                }
+
+
+        }
+    }
+
+    private void setupReview(){
+
+        reviewTagLocation= (LinearLayout) findViewById(R.id.reviewTagLocation);
+        location= (LinearLayout) findViewById(R.id.location1);
+        position= (LinearLayout) findViewById(R.id.position);
+        location.setVisibility(View.GONE);
+        position.setVisibility(View.GONE);
+
+        reviewTrigger=(TextView) findViewById(R.id.tagLocationTrigger);
+        reviewNama=(TextView) findViewById(R.id.reviewNamaTWisata);
+        reviewJenis=(TextView) findViewById(R.id.reviewJenis);
+        reviewLongitude=(TextView) findViewById(R.id.reviewLongitude);
+        reviewLatitude=(TextView) findViewById(R.id.reviewLatitude);
+
+    }
+
+
+    public void tagLocation(View view) {
+        Intent i=new Intent(this,TagLocationActivity.class);
+        startActivityForResult(i , REQUEST_TAG_LOCATION);
     }
 
     public interface Callbacks {

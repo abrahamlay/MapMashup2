@@ -12,7 +12,7 @@
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1">
 
         <FrameLayout
@@ -21,6 +21,80 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
     </FrameLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="tagLocation"
+        android:id="@+id/reviewTagLocation">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp" >
+
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Click for tag location"
+                android:id="@+id/tagLocationTrigger"
+                android:layout_weight="0.3" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:id="@+id/location1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Unkown Tag"
+                android:id="@+id/reviewNamaTWisata"
+                style="@style/Base.TextAppearance.AppCompat"
+                android:layout_weight="0.3" />
+
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Jenis"
+                android:id="@+id/reviewJenis"
+                android:layout_weight="0.3" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:id="@+id/position">
+
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Longitude"
+                android:id="@+id/reviewLongitude"
+                android:layout_weight="0.3" />
+
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/reviewLatitude"
+                android:layout_weight="0.3"
+                android:text="Latitude" />
+        </LinearLayout>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,7 +115,8 @@
             android:padding="8dp"
             android:textAppearance="?android:textAppearanceLarge"
             android:textColorHint="#c00"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:nestedScrollingEnabled="false" />
     </LinearLayout>
 
 </LinearLayout>
