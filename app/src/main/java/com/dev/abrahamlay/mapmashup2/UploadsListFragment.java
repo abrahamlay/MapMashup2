@@ -5,7 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.IntentSender;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +22,6 @@ import com.dev.abrahamlay.mapmashup2.util.VideoData;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.PlusOneButton;
 import com.google.android.gms.plus.model.people.Person;
 
 import java.util.List;
@@ -65,6 +64,7 @@ public class UploadsListFragment extends Fragment implements GoogleApiClient.Con
         View listView = inflater.inflate(R.layout.list_fragment, container, false);
         mGridView = (GridView) listView.findViewById(R.id.grid_view);
         TextView emptyView = (TextView) listView.findViewById(android.R.id.empty);
+
         mGridView.setEmptyView(emptyView);
         return listView;
     }
@@ -211,10 +211,10 @@ public class UploadsListFragment extends Fragment implements GoogleApiClient.Con
             ((TextView) convertView.findViewById(android.R.id.text1))
                     .setText(video.getTitle());
             ((NetworkImageView) convertView.findViewById(R.id.thumbnail)).setImageUrl(video.getThumbUri(), mImageLoader);
-            if (mGoogleApiClient.isConnected()) {
-                ((PlusOneButton) convertView.findViewById(R.id.plus_button))
-                        .initialize(video.getWatchUri(), null);
-            }
+//            if (mGoogleApiClient.isConnected()) {
+//                ((PlusOneButton) convertView.findViewById(R.id.plus_button))
+//                        .initialize(video.getWatchUri(), null);
+//            }
             convertView.findViewById(R.id.main_target).setOnClickListener(
                     new View.OnClickListener() {
                         @Override

@@ -36,23 +36,25 @@ public class ServiceHandler {
     List<Marker> markerList= new ArrayList<Marker>();
     List<String> Jenis= new ArrayList<String>();
    HashMap<String,String>ThumbUrl= new HashMap<>();
+    HashMap<String,String>rating= new HashMap<>();
     HashMap<String,String>YouTubeID= new HashMap<>();
     String imgYoutube="https://img.youtube.com/vi/";
     String imgQuality="/mqdefault.jpg";
     private static final String TagNama="namaTempatWisata";
     private static final String TagJenis="kodeJenis";
     private static final String TagUsername="username";
+    private static final String TagRating="rating";
     private static final String TagLongitude="Longitude";
     private static final String TagLatitude="Latitude";
     private static final String TagLink="linkVideo";
     JSONParser jsonparsing= new JSONParser();
 
-    public List<MarkerData> getMarkerDataList() {
-        return markerDataList;
-    }
-
     public String getThumbUrl(String MarkerID) {
         return ThumbUrl.get(MarkerID);
+    }
+
+    public String getRating(String MarkerID) {
+        return rating.get(MarkerID);
     }
 
     public String getYouTubeID(String MarkerID) {
@@ -68,8 +70,6 @@ public class ServiceHandler {
                    @Override
                    public void onResponse(JSONObject response) {
                        Log.d(TAG, response.toString());
-
-
 
                        markerDataList=jsonparsing.getMarker(response.toString());
 
@@ -105,6 +105,7 @@ public class ServiceHandler {
             );
 
             YouTubeID.put(mMarker.getId(),marker.get(i).getLinkVideo());
+            rating.put(mMarker.getId(), Float.toString(marker.get(i).getRating()));
             String thumbvideo = imgYoutube + marker.get(i).getLinkVideo() +imgQuality ;
             marker.get(i).setLinkVideo(thumbvideo);
                 ThumbUrl.put(mMarker.getId(),marker.get(i).getLinkVideo());
@@ -118,7 +119,7 @@ public class ServiceHandler {
 
     }
 
-    public void PostTempatWisataData(String url, final String TAG, final Context context, final String nama, final long jenis, final double longitude, final double latitude, final String account, final String link){
+    public void PostTempatWisataData(String url, final String TAG, final Context context, final String nama, final long jenis, final double longitude, final double latitude, final String account, final String link, final float rating){
 
 //        JSONObject params = new JSONObject();
 //        try {
@@ -147,7 +148,7 @@ public class ServiceHandler {
                         String nodeErrorNT = s.get(jsonparsing.nodeErrorNT);
                         String nodeMessageNT = s.get(jsonparsing.nodeMessageNT);
                         Log.d(TAG, nodeErrorNT+" "+nodeMessageNT);
-                        Toast.makeText(context,nodeMessageNT,Toast.LENGTH_SHORT);
+                        Toast.makeText(context,nodeMessageNT,Toast.LENGTH_SHORT).show();
                         pDialog.hide();
 
                     }
@@ -166,6 +167,7 @@ public class ServiceHandler {
                 params.put(TagNama, nama);
                 params.put(TagJenis, String.valueOf(jenis));
                 params.put(TagUsername, account);
+                params.put(TagRating, String.valueOf(rating));
                 params.put(TagLongitude, String.valueOf(longitude));
                 params.put(TagLatitude, String.valueOf(latitude));
                 params.put(TagLink, link);

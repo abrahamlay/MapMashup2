@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.dev.abrahamlay.mapmashup2.util.NetworkSingleton;
@@ -53,12 +54,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class VideoListActivity extends AppCompatActivity implements UploadsListFragment.Callbacks{
+public class AccountVideoListActivity extends AppCompatActivity implements UploadsListFragment.Callbacks{
 
     // private static final int MEDIA_TYPE_VIDEO = 7;
     public static final String ACCOUNT_KEY = "accountName";
     public static final String MESSAGE_KEY = "message";
     public static final String YOUTUBE_ID = "youtubeId";
+    public static final String CHANNEL_ID = "channelId";
+
     public static final String YOUTUBE_WATCH_URL_PREFIX = "http://www.youtube.com/watch?v=";
     static final String REQUEST_AUTHORIZATION_INTENT = "com.dev.abrahamlay.RequestAuth";
     static final String REQUEST_AUTHORIZATION_INTENT_PARAM = "com.google.example.yt.RequestAuth.param";
@@ -69,12 +72,12 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
     private static final int RESULT_PICK_IMAGE_CROP = 4;
     private static final int RESULT_VIDEO_CAP = 5;
     private static final int REQUEST_DIRECT_TAG = 6;
-    private static final String TAG = "VideoListActivity";
+    private static final String TAG = "AccountVideoListActivity";
 
-    private static final String url="http://abrahamlay.esy.es/mapmashupservice/newTag.php";
+
     final HttpTransport transport = AndroidHttp.newCompatibleTransport();
     final JsonFactory jsonFactory = new GsonFactory();
-    GoogleAccountCredential credential;
+    public GoogleAccountCredential credential;
     private ImageLoader mImageLoader;
     private String mChosenAccountName;
     private Uri mFileURI = null;
@@ -101,7 +104,7 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
                 loadAccount();
             }
             credential.setSelectedAccountName(mChosenAccountName);
-            mUploadsListFragment = (UploadsListFragment) getFragmentManager()
+            mUploadsListFragment = (UploadsListFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.list_fragment);
 
     }
@@ -240,15 +243,20 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
                     long jenis = data.getExtras().getLong(TagLocationActivity.nodeKodeJenis);
                     double longitude = data.getExtras().getDouble(TagLocationActivity.nodeLongitude);
                     double latitude =data.getExtras().getDouble(TagLocationActivity.nodeLatitude);
-                    if (youtubeId.equals(mVideoData.getYouTubeId())) {
-                        directTag(mVideoData,nama,jenis,longitude,latitude,mChosenAccountName);
+                    float rating =data.getExtras().getFloat(TagLocationActivity.nodeRating);
+                    Log.d(TAG,"Lokasi 1 :"+nama+" "+jenis+" "+longitude+" "+latitude+" "+jenis+" "+youtubeId+" "+rating);
+                    if (youtubeId.equals(mVideoData.getYouTubeId())&&rating!=0) {
+                        directTag(mVideoData,nama,jenis,longitude,latitude,rating,mChosenAccountName);
+                    }
+                    else{
+                        Toast.makeText(this,"Gagal", Toast.LENGTH_LONG).show();
                     }
                 }
                 break;
         }
     }
 
-    private void directTag(final VideoData video, String nama, long jenis, double longitude, double latitude, String mAccount) {
+    public void directTag(final VideoData video, String nama, long jenis, double longitude, double latitude, float rating, String mAccount) {
         final Video updateVideo = new Video();
         VideoSnippet snippet = video
                 .addTags(Arrays.asList(
@@ -277,8 +285,10 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
         }.execute((Void) null);
 
         ServiceHandler sc= new ServiceHandler();
-        sc.PostTempatWisataData(url,TAG,VideoListActivity.this,nama,jenis,longitude,latitude,mAccount,video.getYouTubeId());
-        Log.d(TAG,"Lokasi :"+nama+" "+jenis+" "+longitude+" "+latitude+" "+mAccount+" "+video.getYouTubeId());
+        sc.PostTempatWisataData(Constants.url_newtag,TAG,AccountVideoListActivity.this,nama,jenis,longitude,latitude,mAccount,video.getYouTubeId(),rating);
+        Log.d(TAG,"Lokasi :"+nama+" "+jenis+" "+longitude+" "+latitude+" "+mAccount+" "+video.getYouTubeId()+" "+rating );
+        Intent intent= new Intent(AccountVideoListActivity.this, MainActivity.class);
+        startActivity(intent);
 //        Toast.makeText(this,
 //                R.string.video_submitted_to_ytdl, Toast.LENGTH_LONG)
 //                .show();
@@ -310,7 +320,6 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
                         credential).setApplicationName(Constants.APP_NAME)
                         .build();
 
-
                 try {
                     /*
                      * Now that the user is authenticated, the app makes a
@@ -320,6 +329,8 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
 					 * https://developers.google.com/youtube
 					 * /v3/docs/channels/list
 					 */
+
+
                     ChannelListResponse clr = youtube.channels()
                             .list("contentDetails").setMine(true).execute();
 
@@ -381,7 +392,7 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
                             userRecoverableException.getIntent(),
                             REQUEST_AUTHORIZATION);
                 } catch (IOException e) {
-                    Utils.logAndShow(VideoListActivity.this, Constants.APP_NAME, e);
+                    Utils.logAndShow(AccountVideoListActivity.this, Constants.APP_NAME, e);
                 }
                 return null;
             }
@@ -456,7 +467,7 @@ public class VideoListActivity extends AppCompatActivity implements UploadsListF
         runOnUiThread(new Runnable() {
             public void run() {
                 Dialog dialog = GooglePlayServicesUtil.getErrorDialog(
-                        connectionStatusCode, VideoListActivity.this,
+                        connectionStatusCode, AccountVideoListActivity.this,
                         REQUEST_GOOGLE_PLAY_SERVICES);
                 dialog.show();
             }

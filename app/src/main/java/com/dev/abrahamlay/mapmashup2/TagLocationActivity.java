@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -19,10 +20,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
-public class TagLocationActivity extends AppCompatActivity implements OnMapReadyCallback, AdapterView.OnItemSelectedListener {
+public class TagLocationActivity extends AppCompatActivity implements OnMapReadyCallback, AdapterView.OnItemSelectedListener, GoogleMap.OnMarkerDragListener, RatingBar.OnRatingBarChangeListener {
 
     private GoogleMap mMap;
     private GPSTracker gps;
@@ -35,13 +38,16 @@ public class TagLocationActivity extends AppCompatActivity implements OnMapReady
     public static final String nodeKodeJenis="kodejenis";
     public static final String nodeLongitude="longitude";
     public static final String nodeLatitude="latitude";
+    public static final String nodeRating="rating";
     private EditText namaTempatWisata;
     private Spinner jenis;
     private ServiceHandler service= new ServiceHandler();
-    private String url="http://abrahamlay.esy.es/mapmashupservice/getJenis.php";
+
     private ArrayList<String> jenisList;
     private String namaJenis;
     private long kodeJenis;
+    private RatingBar mBar;
+    private float tagRating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +56,7 @@ public class TagLocationActivity extends AppCompatActivity implements OnMapReady
         googlemaps();
         setupform();
         intent = getIntent();
-//        String youtubeId = intent.getStringExtra(VideoListActivity.YOUTUBE_ID);
+//        String youtubeId = intent.getStringExtra(AccountVideoListActivity.YOUTUBE_ID);
     }
 
     private void googlemaps() {
@@ -64,8 +70,10 @@ public class TagLocationActivity extends AppCompatActivity implements OnMapReady
 
         namaTempatWisata=(EditText) findViewById(R.id.namaTempatWisata);
         jenis=(Spinner) findViewById(R.id.jenis);
+        mBar = (RatingBar) findViewById(R.id.tagRatingBar);
+        mBar.setOnRatingBarChangeListener(this);
         jenis.setOnItemSelectedListener(this);
-        service.GetJsonSpinnerJenis(url,TAG,TagLocationActivity.this,jenis);
+        service.GetJsonSpinnerJenis(Constants.url_jenis,TAG,TagLocationActivity.this,jenis);
 
     }
 
@@ -94,8 +102,11 @@ public class TagLocationActivity extends AppCompatActivity implements OnMapReady
 
             LatLng region = new LatLng(latitude, longitude);
             Log.d(TAG,"Marker GPS pos :"+latitude+","+longitude);
+            MarkerOptions position=new MarkerOptions().position(region).draggable(true);
+            mMap.addMarker(position);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(region));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+            mMap.setOnMarkerDragListener(this);
 
         } else {
             // can't get location
@@ -108,14 +119,17 @@ public class TagLocationActivity extends AppCompatActivity implements OnMapReady
     }
 
     public void submitTagLocation(View view){
-        if(namaTempatWisata.getText()!=null && namaJenis!="" && kodeJenis!=0){
+        if(namaTempatWisata.getText()!=null && namaJenis!="" && kodeJenis!=0 && tagRating!=0){
         intent.putExtra(nodeNama,namaTempatWisata.getText().toString());
         intent.putExtra(nodeKodeJenis,kodeJenis);
             intent.putExtra(nodeJenis,namaJenis);
         intent.putExtra(nodeLongitude,longitude);
         intent.putExtra(nodeLatitude,latitude);
+            intent.putExtra(nodeRating,tagRating);
         this.setResult(RESULT_OK,intent);
         finish();
+        }else{
+            Toast.makeText(getApplicationContext(),"Ada field yang masih kosong!!!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -132,5 +146,26 @@ public class TagLocationActivity extends AppCompatActivity implements OnMapReady
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
+        longitude=marker.getPosition().longitude;
+        latitude=marker.getPosition().latitude;
+        Toast.makeText(getApplicationContext(), "Marker Dragged to"+latitude+", "+longitude, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
+        Toast.makeText(getApplicationContext(), "Rating: "+mBar.getRating(), Toast.LENGTH_SHORT).show();
+        tagRating=mBar.getRating();
     }
 }

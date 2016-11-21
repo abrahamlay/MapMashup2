@@ -1,8 +1,6 @@
 <resources>
-    <string name="app_name">MapMashup2</string>
+    <string name="app_name">VideoMap</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="button_authorize">Authorize</string>
     <string name="button_record">RECORD</string>
@@ -49,8 +47,15 @@
 
     <string name="title_pick_video">Pick your video</string>
     <string name="debug_key">AIzaSyD5d-4WtnereeOaXSpPBtDS3RRgaRpO128</string>
+    <!--<string name="debug_key">AIzaSyBcX2whex51DPakuSOv2_DIHKemFPe20Fw</string>-->
     <string name="error_player">There was an error initializing the YouTubePlayer (%1$s)</string>
     <string name="title_activity_main2">Main2Activity</string>
     <string name="loading_video">Loading Video...</string>
     <string name="title_tag_location">Submit Tour Location</string>
+    <string name="title_select_upload">Select Upload Video</string>
+    <string name="title_channell_list">Search Channel</string>
+    <string name="title_search_video">Search Video</string>
+    <string name="loading_channel">Loading Channel...</string>
+    <string name="title_select_video">Select Video</string>
+
 </resources>

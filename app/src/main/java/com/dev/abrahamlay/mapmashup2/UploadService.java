@@ -78,7 +78,7 @@ public class UploadService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         Uri fileUri = intent.getData();
-        String chosenAccountName = intent.getStringExtra(VideoListActivity.ACCOUNT_KEY);
+        String chosenAccountName = intent.getStringExtra(AccountVideoListActivity.ACCOUNT_KEY);
 
         credential =
                 GoogleAccountCredential.usingOAuth2(getApplicationContext(), Lists.newArrayList(Auth.SCOPES));

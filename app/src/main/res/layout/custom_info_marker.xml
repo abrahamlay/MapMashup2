@@ -1,33 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/root_custom_marker"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clickable="false"
-    android:baselineAligned="false"
-    android:gravity="center_horizontal">
+    android:minHeight="?android:listPreferredItemHeightSmall"
+    android:gravity="center_vertical|center_horizontal">
 
-    <com.android.volley.toolbox.NetworkImageView
-        android:id="@+id/thumbnail"
-        android:background="#1000"
-        android:contentDescription="@string/avatar"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="16dp"
+        android:layout_weight="1">
 
-    <TextView
-        android:id="@+id/titleMarker"
-        style="?android:textAppearanceMedium"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-condensed"
-        android:textStyle="bold"
-        android:textSize="12dp"
-        android:text="title"
-        android:textColor="@color/abc_primary_text_material_light"
-        android:gravity="center_vertical|center_horizontal"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingBottom="10dp" />
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/thumbnail"
+            android:background="#1000"
+            android:contentDescription="@string/avatar"
+            android:layout_gravity="center_horizontal"
+            android:layout_height="110dp"
+            android:layout_width="200dp" />
+
+        <TextView
+            android:id="@+id/titleMarker"
+            style="?android:textAppearanceMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed"
+            android:textStyle="bold"
+            android:text="title"
+            android:textColor="@color/abc_primary_text_material_light"
+            android:gravity="center_vertical|center_horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textSize="28sp" />
+
+        <RatingBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/myRatingBar"
+            android:numStars="5"
+            style="@style/Widget.AppCompat.RatingBar.Small"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/snippetMarker"
         style="?android:textAppearanceMedium"
@@ -40,5 +62,8 @@
         android:gravity="center_vertical|center_horizontal"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingBottom="10dp" />
+        android:paddingBottom="10dp"
+        android:visibility="gone" />
+
+
 </LinearLayout>

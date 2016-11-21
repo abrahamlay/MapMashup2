@@ -56,7 +56,7 @@ public class ReviewActivity extends Activity {
     private void loadAccount() {
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(this);
-        mChosenAccountName = sp.getString(VideoListActivity.ACCOUNT_KEY, null);
+        mChosenAccountName = sp.getString(AccountVideoListActivity.ACCOUNT_KEY, null);
         invalidateOptionsMenu();
     }
 
@@ -75,7 +75,7 @@ public class ReviewActivity extends Activity {
         if (mFileUri != null) {
             Intent uploadIntent = new Intent(this, UploadService.class);
             uploadIntent.setData(mFileUri);
-            uploadIntent.putExtra(VideoListActivity.ACCOUNT_KEY, mChosenAccountName);
+            uploadIntent.putExtra(AccountVideoListActivity.ACCOUNT_KEY, mChosenAccountName);
             startService(uploadIntent);
             Toast.makeText(this, R.string.youtube_upload_started,
                     Toast.LENGTH_LONG).show();

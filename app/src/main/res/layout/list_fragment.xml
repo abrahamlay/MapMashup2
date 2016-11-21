@@ -34,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="8dp">
 
         <TextView
@@ -44,6 +44,8 @@
             android:fontFamily="sans-serif-condensed"
             android:text="@string/pick_one_of_your_videos_to_submit"
             android:textAppearance="?android:textAppearanceMedium"></TextView>
+
+
     </LinearLayout>
 
     <FrameLayout

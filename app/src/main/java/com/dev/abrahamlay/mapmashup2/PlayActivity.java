@@ -50,6 +50,7 @@ public class PlayActivity extends AppCompatActivity implements YouTubePlayer.Pla
     private double latitude;
     private double longitude;
     private long kodeJenis;
+    private float tagRating;
 
     public PlayActivity() {
     }
@@ -71,6 +72,7 @@ public class PlayActivity extends AppCompatActivity implements YouTubePlayer.Pla
         intent.putExtra(TagLocationActivity.nodeJenis,jenis);
         intent.putExtra(TagLocationActivity.nodeLongitude,longitude);
         intent.putExtra(TagLocationActivity.nodeLatitude,latitude);
+        intent.putExtra(TagLocationActivity.nodeRating,tagRating);
         this.setResult(RESULT_OK, intent);
         finish();
     }
@@ -169,7 +171,7 @@ public class PlayActivity extends AppCompatActivity implements YouTubePlayer.Pla
             submitButton.setVisibility(View.GONE);
             setTitle(R.string.playing_uploaded_video);
         }
-        String youtubeId = intent.getStringExtra(VideoListActivity.YOUTUBE_ID);
+        String youtubeId = intent.getStringExtra(AccountVideoListActivity.YOUTUBE_ID);
         panToVideo(youtubeId);
 
     }
@@ -198,7 +200,7 @@ public class PlayActivity extends AppCompatActivity implements YouTubePlayer.Pla
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        NavUtils.navigateUpFromSameTask(this);
+//        NavUtils.navigateUpFromSameTask(this);
     }
 
     @Override
@@ -217,6 +219,7 @@ public class PlayActivity extends AppCompatActivity implements YouTubePlayer.Pla
                     kodeJenis=data.getExtras().getLong(TagLocationActivity.nodeKodeJenis);
                     longitude=data.getExtras().getDouble(TagLocationActivity.nodeLongitude);
                     latitude =data.getExtras().getDouble(TagLocationActivity.nodeLatitude);
+                    tagRating =data.getExtras().getFloat(TagLocationActivity.nodeRating);
 
                     reviewNama.setText(nama);
                     reviewJenis.setText(jenis);

@@ -10,4 +10,7 @@ public class Constants {
     // playlist ID for the app to work
     public static final String UPLOAD_PLAYLIST = "PL_XBSmwNgDe7UQGJ2guN2X8YqQ3EGwXyi";
     public static final String APP_NAME = "MapMashup/1.0";
+    public static final String url_newtag="http://abrahamlay.esy.es/mapmashupservice/newTag.php";
+    public static final String url_marker="http://abrahamlay.esy.es/mapmashupservice/getPlaceList.php";
+    public static final String url_jenis="http://abrahamlay.esy.es/mapmashupservice/getJenis.php";
 }

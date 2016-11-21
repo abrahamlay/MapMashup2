@@ -42,23 +42,36 @@
             android:exported="true" />
 
         <activity
-            android:name=".VideoListActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_pick_video"
+            android:name=".SelectUploadActivity"
+            android:label="@string/title_select_upload"
             android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".ChannelListActivity"
+            android:label="@string/title_channell_list"
+            android:parentActivityName=".SelectUploadActivity" />
+        <activity
+            android:name=".SearchVideoListActivity"
+            android:label="@string/title_search_video"
+            android:parentActivityName=".SelectUploadActivity" />
+        <activity
+            android:name=".AccountVideoListActivity"
+            android:label="@string/title_pick_video"
+            android:parentActivityName=".SelectUploadActivity" />
         <activity
             android:name=".ReviewActivity"
             android:label="@string/title_activity_review"
-            android:parentActivityName=".VideoListActivity" />
+            android:parentActivityName=".AccountVideoListActivity" />
         <activity
             android:name=".PlayActivity"
-            android:label="@string/title_activity_play"
-            android:parentActivityName=".VideoListActivity" />
+            android:label="@string/title_activity_play" />
         <activity
             android:name=".TagLocationActivity"
             android:label="@string/title_tag_location"
-            android:parentActivityName=".PlayActivity"/>
+            android:parentActivityName=".PlayActivity" />
 
+        <activity android:name=".ChannelVideoListActivity"
+            android:label="@string/title_select_video"
+            android:parentActivityName=".ChannelListActivity"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -66,6 +79,7 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
 
 
     </application>

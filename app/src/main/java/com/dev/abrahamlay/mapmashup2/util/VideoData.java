@@ -25,6 +25,9 @@ public class VideoData {
         return mVideo.getId();
     }
 
+    public String getDescription() {
+        return mVideo.getSnippet().getDescription();
+    }
     public String getTitle() {
         return mVideo.getSnippet().getTitle();
     }

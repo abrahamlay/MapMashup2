@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,7 +30,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerFragment;
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity
         YouTubePlayer.PlayerStateChangeListener,
         YouTubePlayer.OnFullscreenListener {
     //    ProgressDialog pDialog;
-    String url = "http://abrahamlay.esy.es/mapmashupservice/getPlaceList.php";
+//    String url = "http://abrahamlay.esy.es/mapmashupservice/getPlaceList.php";
     private GoogleMap mMap;
     private GPSTracker gps;
     private double latitude;
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity
                 // TODO: Get info about the selected place.
                 Log.i(autocompleteFragment.getTag(), "Place: " + place.getName());
 
-                mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
+//                mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), VideoListActivity.class);
+                Intent intent = new Intent(getApplicationContext(), SelectUploadActivity.class);
                 startActivity(intent);
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity
 //            }
 //        };
 
-        service.GetJsonMarkerData(url,TAG,MainActivity.this,mMap);
+        service.GetJsonMarkerData(Constants.url_marker,TAG,MainActivity.this,mMap);
 
         mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
 
@@ -278,11 +278,14 @@ public class MainActivity extends AppCompatActivity
         private View contentCustomMarker(Marker marker) {
             MainActivity.this.marker = marker;
             String youtubeID = service.getYouTubeID(marker.getId());
+            String rating = service.getRating(marker.getId());
 
 //
             image=(NetworkImageView) view.findViewById(R.id.thumbnail);
             final TextView titleUi = (TextView) view.findViewById(R.id.titleMarker);
             final TextView snippetUi = (TextView) view.findViewById(R.id.snippetMarker);
+            RatingBar simpleRatingBar = (RatingBar) view.findViewById(R.id.myRatingBar); // initiate a rating bar
+//            simpleRatingBar.setBackgroundColor(Color.); // set background color for a rating bar
             String thumburl=service.getThumbUrl(marker.getId());
 //            Log.d(TAG,thumburl);
 //            String thumburl=null;
@@ -298,10 +301,16 @@ public class MainActivity extends AppCompatActivity
                     } else {
                         titleUi.setText("Unknown Title");
                     }
-                    if (marker.getSnippet() != null) {
-                        snippetUi.setText("Rating :" + marker.getSnippet() + " " + youtubeID);
+//                    if (marker.getSnippet() != null) {
+//                        snippetUi.setText("Rating :" + marker.getSnippet() + " " + youtubeID);
+//                    } else {
+//                        snippetUi.setText("Unknown Snippet");
+//                    }
+
+                    if (rating != null) {
+                        simpleRatingBar.setRating(Float.valueOf(rating));
                     } else {
-                        snippetUi.setText("Unknown Snippet");
+                        simpleRatingBar.setRating(0);
                     }
             return view;
         }

@@ -189,10 +189,10 @@ public class ResumableUpload {
                                     UserRecoverableAuthIOException userRecoverableException) {
         LocalBroadcastManager manager = LocalBroadcastManager.getInstance(context);
         Intent authIntent = userRecoverableException.getIntent();
-        Intent runReqAuthIntent = new Intent(VideoListActivity.REQUEST_AUTHORIZATION_INTENT);
-        runReqAuthIntent.putExtra(VideoListActivity.REQUEST_AUTHORIZATION_INTENT_PARAM, authIntent);
+        Intent runReqAuthIntent = new Intent(AccountVideoListActivity.REQUEST_AUTHORIZATION_INTENT);
+        runReqAuthIntent.putExtra(AccountVideoListActivity.REQUEST_AUTHORIZATION_INTENT_PARAM, authIntent);
         manager.sendBroadcast(runReqAuthIntent);
-        Log.d(TAG, String.format("Sent broadcast %s", VideoListActivity.REQUEST_AUTHORIZATION_INTENT));
+        Log.d(TAG, String.format("Sent broadcast %s", AccountVideoListActivity.REQUEST_AUTHORIZATION_INTENT));
     }
 
     private static void notifyFailedUpload(Context context, String message, NotificationManager notifyManager,
@@ -209,7 +209,7 @@ public class ResumableUpload {
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         Intent notificationIntent = new Intent(context, PlayActivity.class);
-        notificationIntent.putExtra(VideoListActivity.YOUTUBE_ID, videoId);
+        notificationIntent.putExtra(AccountVideoListActivity.YOUTUBE_ID, videoId);
         notificationIntent.setAction(Intent.ACTION_VIEW);
 
         URL url;
