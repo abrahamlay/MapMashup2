@@ -23,8 +23,7 @@
         android:id="@+id/video_box"></FrameLayout>
 
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <fragment
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:id="@+id/map"
         tools:context=".MapsActivity"

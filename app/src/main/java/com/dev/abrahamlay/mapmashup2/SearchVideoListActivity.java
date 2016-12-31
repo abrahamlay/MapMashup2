@@ -183,9 +183,13 @@ public class SearchVideoListActivity extends AppCompatActivity implements View.O
 
     private void directTag(String Youtubeid, String nama, long jenis, double longitude, double latitude, String mAccount,float rating) {
         ServiceHandler sc= new ServiceHandler();
+
         sc.PostTempatWisataData(Constants.url_newtag,TAG,SearchVideoListActivity.this,nama,jenis,longitude,latitude,mAccount,Youtubeid, rating);
+
         Log.d(TAG,"Lokasi :"+nama+" "+jenis+" "+longitude+" "+latitude+" "+mAccount+" "+Youtubeid);
+
         Intent intent= new Intent(SearchVideoListActivity.this, MainActivity.class);
+
         startActivity(intent);
     }
 
