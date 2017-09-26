@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -46,6 +47,9 @@ import com.google.api.services.youtube.model.PlaylistItemListResponse;
 import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoListResponse;
 import com.google.api.services.youtube.model.VideoSnippet;
+import com.nhaarman.supertooltips.ToolTip;
+import com.nhaarman.supertooltips.ToolTipRelativeLayout;
+import com.nhaarman.supertooltips.ToolTipView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,7 +58,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class AccountVideoListActivity extends AppCompatActivity implements UploadsListFragment.Callbacks{
+public class AccountVideoListActivity extends AppCompatActivity implements UploadsListFragment.Callbacks, ToolTipView.OnToolTipViewClickedListener {
 
     // private static final int MEDIA_TYPE_VIDEO = 7;
     public static final String ACCOUNT_KEY = "accountName";
@@ -85,6 +89,8 @@ public class AccountVideoListActivity extends AppCompatActivity implements Uploa
     private UploadBroadcastReceiver broadcastReceiver;
     private UploadsListFragment mUploadsListFragment;
     ProgressDialog progress;
+    private ToolTipView myToolTipView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
@@ -106,10 +112,23 @@ public class AccountVideoListActivity extends AppCompatActivity implements Uploa
             credential.setSelectedAccountName(mChosenAccountName);
             mUploadsListFragment = (UploadsListFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.list_fragment);
+        ToolTipRelativeLayout toolTipRelativeLayout = (ToolTipRelativeLayout) findViewById(R.id.activity_account_video_tooltipRelativeLayout);
 
+        ToolTip toolTip = new ToolTip()
+                .withText("Pick your video from your gallery or record new video")
+                .withTextColor(ContextCompat.getColor(getApplicationContext(),R.color.text))
+                .withColor(ContextCompat.getColor(getApplicationContext(),R.color.bg_screen3))
+                .withAnimationType(ToolTip.AnimationType.FROM_TOP);
+        myToolTipView = toolTipRelativeLayout.showToolTipForView(toolTip, findViewById(R.id.buttonpickorrecord));
+        myToolTipView.setOnToolTipViewClickedListener(AccountVideoListActivity.this);
     }
 
-
+//    private void checkPermissionLocation(){
+//        if (ContextCompat.checkSelfPermission(AccountVideoListActivity.this, Manifest.permission.GET_ACCOUNTS)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(AccountVideoListActivity.this, REQUEST_ACCOUNT_PICKER,);
+//        }
+//    }
 
     @Override
     protected void onResume() {
@@ -289,6 +308,7 @@ public class AccountVideoListActivity extends AppCompatActivity implements Uploa
         Log.d(TAG,"Lokasi :"+nama+" "+jenis+" "+longitude+" "+latitude+" "+mAccount+" "+video.getYouTubeId()+" "+rating );
         Intent intent= new Intent(AccountVideoListActivity.this, MainActivity.class);
         startActivity(intent);
+        finish();
 //        Toast.makeText(this,
 //                R.string.video_submitted_to_ytdl, Toast.LENGTH_LONG)
 //                .show();
@@ -500,6 +520,10 @@ public class AccountVideoListActivity extends AppCompatActivity implements Uploa
                 REQUEST_ACCOUNT_PICKER);
     }
 
+    @Override
+    public void onToolTipViewClicked(ToolTipView toolTipView) {
+
+    }
 
 
     // public Uri getOutputMediaFile(int type)

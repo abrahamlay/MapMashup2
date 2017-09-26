@@ -58,4 +58,41 @@
     <string name="loading_channel">Loading Channel...</string>
     <string name="title_select_video">Select Video</string>
 
+
+    <string name="title_activity_welcome">Home Screen</string>
+    <string name="next">NEXT</string>
+    <string name="skip">SKIP</string>
+    <string name="start">GOT IT</string>
+
+    <string name="slide_1_title">Welcome to Video Map!</string>
+    <string name="slide_1_desc">The easiest way to share and browse your travelling activity with video!</string>
+
+    <string name="slide_2_title">Find Your Destination!</string>
+    <string name="slide_2_desc">Find your destination region with many tour places!</string>
+
+    <string name="slide_3_title">Play The Tour Video!</string>
+    <string name="slide_3_desc">See travelling activity on the video!</string>
+
+    <string name="slide_4_title">Add Tour Places Video!</string>
+    <string name="slide_4_desc">Add tour place with chosen video!</string>
+
+    <string name="slide_5_title">Add Tour Places Location!</string>
+    <string name="slide_5_desc">Tag the location of the tour place!</string>
+
+    <string name="play_again_desc">To see the welcome slider again, goto Settings -> apps -> welcome slider -> clear data</string>
+    <string name="play_again">Play Again</string>
+    <string name="apache_license_header">Copyright 2017 Abraham Richard Ivan Lay</string>
+    <string name="apache_license_body">
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</string>
 </resources>

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,19 +24,23 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.nhaarman.supertooltips.ToolTip;
+import com.nhaarman.supertooltips.ToolTipRelativeLayout;
+import com.nhaarman.supertooltips.ToolTipView;
 
 import java.util.List;
 
 /**
  * Created by Abraham on 8/15/2016.
  */
-public class UploadsListFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener {
+public class UploadsListFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener, ToolTipView.OnToolTipViewClickedListener {
     private static final String TAG = UploadsListFragment.class.getName();
     private static Context mContext;
     private Callbacks mCallbacks;
     private GoogleApiClient mGoogleApiClient;
     private GridView mGridView;
     private ImageLoader mImageLoader;
+    private ToolTipView myToolTipView;
 
     public UploadsListFragment() {
     }
@@ -102,6 +107,18 @@ public class UploadsListFragment extends Fragment implements GoogleApiClient.Con
                         .setText(currentPerson.getDisplayName());
             }
         }
+        ToolTipRelativeLayout toolTipRelativeLayout = (ToolTipRelativeLayout) getView().findViewById(R.id.activity_fragment_account_video_tooltipRelativeLayout);
+
+        ToolTip toolTip = new ToolTip()
+                .withText("Your youtube account. ")
+                .withTextColor(ContextCompat.getColor(getView().getContext(),R.color.text))
+                .withColor(ContextCompat.getColor(getView().getContext(),R.color.bg_screen3))
+                .withAnimationType(ToolTip.AnimationType.FROM_TOP);
+        myToolTipView = toolTipRelativeLayout.showToolTipForView(toolTip, getView().findViewById(R.id.youtube_account));
+        myToolTipView.setOnToolTipViewClickedListener(UploadsListFragment.this);
+
+
+
     }
 
     @Override
@@ -169,6 +186,11 @@ public class UploadsListFragment extends Fragment implements GoogleApiClient.Con
         mImageLoader = null;
     }
 
+    @Override
+    public void onToolTipViewClicked(ToolTipView toolTipView) {
+
+    }
+
     public interface Callbacks {
         public ImageLoader onGetImageLoader();
 
@@ -215,6 +237,8 @@ public class UploadsListFragment extends Fragment implements GoogleApiClient.Con
 //                ((PlusOneButton) convertView.findViewById(R.id.plus_button))
 //                        .initialize(video.getWatchUri(), null);
 //            }
+
+
             convertView.findViewById(R.id.main_target).setOnClickListener(
                     new View.OnClickListener() {
                         @Override

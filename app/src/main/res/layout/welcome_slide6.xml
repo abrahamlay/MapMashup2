@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical|center_horizontal"
+    android:background="@color/bg_screen3">
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="@string/apache_license_header"
+        android:textColor="@android:color/white"
+        android:textSize="18dp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="@dimen/desc_padding"
+        android:paddingRight="@dimen/desc_padding"
+        android:text="@string/apache_license_body"
+        android:textAlignment="gravity"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/slide_desc" />
+</LinearLayout>

@@ -34,11 +34,14 @@
             <!--android:background="?android:attr/actionModeWebSearchDrawable" -->
 
     </LinearLayout>
-
+    <com.nhaarman.supertooltips.ToolTipRelativeLayout
+        android:id="@+id/activity_search_video_tooltipRelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <ListView
         android:id="@+id/video_found_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="0.2" />
 
 

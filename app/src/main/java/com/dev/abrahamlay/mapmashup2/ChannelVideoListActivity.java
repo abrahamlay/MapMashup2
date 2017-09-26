@@ -174,6 +174,7 @@ public class ChannelVideoListActivity extends AppCompatActivity {
         Log.d(TAG,"Lokasi :"+nama+" "+jenis+" "+longitude+" "+latitude+" "+mAccount+" "+Youtubeid);
         Intent intent= new Intent(ChannelVideoListActivity.this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
     private void loadData(String channelId) {

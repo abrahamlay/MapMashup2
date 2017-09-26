@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -42,6 +43,9 @@ import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoListResponse;
+import com.nhaarman.supertooltips.ToolTip;
+import com.nhaarman.supertooltips.ToolTipRelativeLayout;
+import com.nhaarman.supertooltips.ToolTipView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,7 +55,7 @@ import java.util.List;
 import static com.dev.abrahamlay.mapmashup2.AccountVideoListActivity.ACCOUNT_KEY;
 import static com.dev.abrahamlay.mapmashup2.AccountVideoListActivity.YOUTUBE_ID;
 
-public class SearchVideoListActivity extends AppCompatActivity implements View.OnClickListener {
+public class SearchVideoListActivity extends AppCompatActivity implements View.OnClickListener, ToolTipView.OnToolTipViewClickedListener {
 
     private static final int REQUEST_GOOGLE_PLAY_SERVICES = 0;
     private static final int REQUEST_GMS_ERROR_DIALOG = 1;
@@ -73,6 +77,7 @@ public class SearchVideoListActivity extends AppCompatActivity implements View.O
     private static final long NUMBER_OF_VIDEOS_RETURNED=10;
     private ImageLoader mImageLoader;
     private String TAG="SearchVideoList";
+    private ToolTipView myToolTipView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +101,15 @@ public class SearchVideoListActivity extends AppCompatActivity implements View.O
         searchButton=(Button) findViewById(R.id.search_button);
         videosFound = (ListView)findViewById(R.id.video_found_list);
 
+        ToolTipRelativeLayout toolTipRelativeLayout = (ToolTipRelativeLayout) findViewById(R.id.activity_search_video_tooltipRelativeLayout);
+
+        ToolTip toolTip = new ToolTip()
+                .withText("Search video with keyword")
+                .withTextColor(ContextCompat.getColor(getApplicationContext(),R.color.text))
+                .withColor(ContextCompat.getColor(getApplicationContext(),R.color.bg_screen4))
+                .withAnimationType(ToolTip.AnimationType.FROM_TOP);
+        myToolTipView = toolTipRelativeLayout.showToolTipForView(toolTip, findViewById(R.id.search_input));
+        myToolTipView.setOnToolTipViewClickedListener(SearchVideoListActivity.this);
 
         searchButton.setOnClickListener(this);
 
@@ -191,6 +205,7 @@ public class SearchVideoListActivity extends AppCompatActivity implements View.O
         Intent intent= new Intent(SearchVideoListActivity.this, MainActivity.class);
 
         startActivity(intent);
+        finish();
     }
 
     @Override
@@ -354,5 +369,10 @@ public class SearchVideoListActivity extends AppCompatActivity implements View.O
     private void chooseAccount() {
         startActivityForResult(credential.newChooseAccountIntent(),
                 REQUEST_ACCOUNT_PICKER);
+    }
+
+    @Override
+    public void onToolTipViewClicked(ToolTipView toolTipView) {
+
     }
 }

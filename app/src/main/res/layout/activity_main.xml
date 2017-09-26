@@ -21,6 +21,10 @@
             />
 
     </android.support.design.widget.AppBarLayout>
+    <!--<FrameLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/video_box"></FrameLayout>-->
 
     <include layout="@layout/content_main"
         android:id="@+id/include" />
@@ -39,8 +43,21 @@
         android:layout_height="wrap_content"
         android:id="@+id/buttonWebView"
         app:layout_anchor="@+id/include"
-        app:layout_anchorGravity="bottom|left"
-        android:layout_gravity="top|right" />
+        app:layout_anchorGravity="bottom|center" />
 
+    <Button
+        android:text="Help"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonHelp"
+        app:layout_anchorGravity="bottom|left"
+        app:layout_anchor="@+id/include"
+        android:minHeight="48dp"
+        android:minWidth="64dp" />
+
+    <com.nhaarman.supertooltips.ToolTipRelativeLayout
+        android:id="@+id/activity_main_tooltipRelativeLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </android.support.design.widget.CoordinatorLayout>

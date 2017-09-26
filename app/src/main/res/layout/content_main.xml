@@ -15,7 +15,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:name="com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment"
-        />
+        app:layout_anchor="@+id/include"
+        app:layout_anchorGravity="top|center_horizontal"
+        android:layout_gravity="center_vertical|left" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -31,6 +33,5 @@
         android:layout_height="match_parent"
         android:layout_weight="0.5">
     </fragment>
-
 
 </LinearLayout>

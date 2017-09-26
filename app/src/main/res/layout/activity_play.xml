@@ -21,7 +21,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
     </FrameLayout>
-
+    <com.nhaarman.supertooltips.ToolTipRelativeLayout
+        android:id="@+id/activity_play_tooltipRelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"

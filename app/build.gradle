@@ -5,12 +5,12 @@ android {
         config {
             keyAlias 'abraham lay'
             keyPassword 'akulupa2016'
-            storeFile file('E:/Download Baru agustus 2015/Dropbox2/Dropbox/Skripsi/Project/keystore/abrahamlay.jks')
+            storeFile file('D:/abraham/GithubCloneAbraham/abrahamlay.jks')
             storePassword 'skripsi2016'
         }
     }
     compileSdkVersion 24
-    buildToolsVersion '23.0.1'
+    buildToolsVersion '26.0.1'
     defaultConfig {
         applicationId "com.dev.abrahamlay.mapmashup2"
         minSdkVersion 16
@@ -47,6 +47,7 @@ dependencies {
     compile 'com.google.api-client:google-api-client-gson:+'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.mcxiaoke.volley:library:1.0.18'
+    compile 'com.nhaarman.supertooltips:library:3.0.+'
     compile files('libs/YouTubeAndroidPlayerApi.jar')
 }
 //apply plugin: 'com.google.gms.google-services'

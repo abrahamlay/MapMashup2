@@ -1,11 +1,15 @@
 package com.dev.abrahamlay.mapmashup2;
 
+import android.Manifest;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -19,6 +23,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.dev.abrahamlay.mapmashup2.util.GPSTracker;
 import com.dev.abrahamlay.mapmashup2.util.NetworkSingleton;
+import com.dev.abrahamlay.mapmashup2.util.PrefManager;
 import com.dev.abrahamlay.mapmashup2.util.ServiceHandler;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
@@ -34,6 +39,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerFragment;
+import com.nhaarman.supertooltips.ToolTip;
+import com.nhaarman.supertooltips.ToolTipRelativeLayout;
+import com.nhaarman.supertooltips.ToolTipView;
 
 public class MainActivity extends AppCompatActivity
         implements OnMapReadyCallback,
@@ -41,7 +49,9 @@ public class MainActivity extends AppCompatActivity
         GoogleMap.OnInfoWindowClickListener,
         GoogleMap.OnMarkerClickListener,
         YouTubePlayer.PlayerStateChangeListener,
-        YouTubePlayer.OnFullscreenListener {
+        YouTubePlayer.OnFullscreenListener,
+        ToolTipView.OnToolTipViewClickedListener,
+        ActivityCompat.OnRequestPermissionsResultCallback{
     //    ProgressDialog pDialog;
 //    String url = "http://abrahamlay.esy.es/mapmashupservice/getPlaceList.php";
     private GoogleMap mMap;
@@ -51,6 +61,7 @@ public class MainActivity extends AppCompatActivity
     private Marker marker;
     ServiceHandler service = new ServiceHandler();
     String TAG = "MainActivity";
+    private static final int REQUEST_INTERNET = 200;
 
     public ImageLoader mImageLoader;
 
@@ -59,21 +70,48 @@ public class MainActivity extends AppCompatActivity
     private Toolbar mActionBarToolbar;
     private FloatingActionButton fab;
     private Button webViewButton;
+    private Button helpButton;
+    private ToolTipView myToolTipView;
+    private PrefManager prefManager;
+    private static String[] PERMISSIONS_CONTACT = {Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION};
+    private ToolTipRelativeLayout toolTipRelativeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        checkPermissionLocation();
+        // Checking for first time launch - before calling setContentView()
+        prefManager = new PrefManager(this);
+        if (prefManager.isFirstTimeLaunch()) {
+            launchHelpScreen();
+            finish();
+        }
         setContentView(R.layout.activity_main);
         mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mActionBarToolbar);
         getSupportActionBar().setTitle(R.string.app_name);
+
+        toolTipRelativeLayout = (ToolTipRelativeLayout) findViewById(R.id.activity_main_tooltipRelativeLayout);
+
         autocomplete();
 
         googlemaps();
-        fabButton();
+        allButton();
 
     }
+    private void checkPermissionLocation(){
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+        != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this, PERMISSIONS_CONTACT,REQUEST_INTERNET);
+        }
+    }
 
+    private void launchHelpScreen() {
+        prefManager.setFirstTimeLaunch(false);
+        startActivity(new Intent(MainActivity.this, HelpActivity.class));
+        finish();
+    }
     private void googlemaps() {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -99,7 +137,7 @@ public class MainActivity extends AppCompatActivity
 
 //                mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
 
             }
 
@@ -109,9 +147,22 @@ public class MainActivity extends AppCompatActivity
                 Log.i(autocompleteFragment.getTag(), "An error occurred: " + status);
             }
         });
+
+//        ToolTipRelativeLayout toolTipRelativeLayout = (ToolTipRelativeLayout) findViewById(R.id.activity_main_tooltipRelativeLayout);
+//
+        ToolTip toolTip = new ToolTip()
+                .withText("Search your destination. ex: Malang")
+                .withTextColor(ContextCompat.getColor(getApplicationContext(),R.color.text))
+                .withColor(ContextCompat.getColor(getApplicationContext(),R.color.bg_screen3))
+                .withAnimationType(ToolTip.AnimationType.FROM_TOP);
+        myToolTipView = toolTipRelativeLayout.showToolTipForView(toolTip, findViewById(R.id.place_autocomplete_fragment));
+        myToolTipView.setOnToolTipViewClickedListener(MainActivity.this);
     }
 
-    private void fabButton() {
+    private void allButton() {
+
+
+
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,9 +184,52 @@ public class MainActivity extends AppCompatActivity
 //                        .setAction("Action", null).show();
             }
         });
+
+        helpButton=(Button) findViewById(R.id.buttonHelp);
+        helpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), HelpActivity.class);
+                startActivity(intent);
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+            }
+        });
+
+//        ToolTipRelativeLayout toolTipRelativeLayout = (ToolTipRelativeLayout) findViewById(R.id.activity_main_tooltipRelativeLayout);
+//
+        ToolTip toolTip = new ToolTip()
+                .withText("Click this button to add tour place.")
+                .withTextColor(ContextCompat.getColor(getApplicationContext(),R.color.text))
+                .withColor(ContextCompat.getColor(getApplicationContext(),R.color.bg_screen1))
+                .withAnimationType(ToolTip.AnimationType.FROM_TOP);
+        myToolTipView = toolTipRelativeLayout.showToolTipForView(toolTip, fab);
+        myToolTipView.setOnToolTipViewClickedListener(MainActivity.this);
     }
 
-
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_INTERNET) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //start audio recording or whatever you planned to do
+            }else if (grantResults[0] == PackageManager.PERMISSION_DENIED){
+                if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    //Show an explanation to the user *asynchronously*
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("This permission is important to record audio.")
+                            .setTitle("Important permission required");
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_INTERNET);
+                        }
+                    });
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_INTERNET);
+                }else{
+                    //Never ask again and handle your app without permission.
+                }
+            }
+        }
+    }
     @Override
     public void onClick(View v) {
 //        switch (v.getId()) {
@@ -191,7 +285,7 @@ public class MainActivity extends AppCompatActivity
             longitude = gps.getLongitude();
 
             LatLng region = new LatLng(latitude, longitude);
-            Log.d(TAG,"Marker GPS pos :"+latitude+","+longitude);
+            Log.d(TAG,"marker GPS pos :"+latitude+","+longitude);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(region));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
 
@@ -257,6 +351,11 @@ public class MainActivity extends AppCompatActivity
         showErrorToast(errorReason.toString());
     }
 
+    @Override
+    public void onToolTipViewClicked(ToolTipView toolTipView) {
+
+    }
+
 
     private class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 //        private final LinearLayout mLinearLayout;
@@ -268,11 +367,22 @@ public class MainActivity extends AppCompatActivity
 //            Get the ImageLoader through your singleton class.
             mImageLoader = NetworkSingleton.getInstance(getApplicationContext()).getImageLoader();
             view = getLayoutInflater().inflate(R.layout.custom_info_marker,null );
+
+
         }
 
 
         @Override
         public View getInfoContents(Marker marker) {
+//            ToolTipRelativeLayout toolTipRelativeLayout = (ToolTipRelativeLayout) findViewById(R.id.activity_main_tooltipRelativeLayout);
+
+            ToolTip toolTip = new ToolTip()
+                    .withText("Click this marker to play video.")
+                    .withTextColor(ContextCompat.getColor(getApplicationContext(),R.color.text))
+                    .withColor(ContextCompat.getColor(getApplicationContext(),R.color.bg_screen2))
+                    .withAnimationType(ToolTip.AnimationType.FROM_TOP);
+            myToolTipView = toolTipRelativeLayout.showToolTipForView(toolTip, contentCustomMarker(marker));
+            myToolTipView.setOnToolTipViewClickedListener(MainActivity.this);
 
             return contentCustomMarker(marker);
         }
@@ -303,7 +413,6 @@ public class MainActivity extends AppCompatActivity
 //            Log.d(TAG,thumburl);
 //            String thumburl=null;
 
-
                     if(thumburl!=null){
                         image.setImageUrl(thumburl, mImageLoader);
                     }else {
@@ -325,6 +434,7 @@ public class MainActivity extends AppCompatActivity
                     } else {
                         simpleRatingBar.setRating(0);
                     }
+
             return view;
         }
 
@@ -350,7 +460,7 @@ public class MainActivity extends AppCompatActivity
                             YouTubePlayer.Provider provider,
                             YouTubePlayer youTubePlayer, boolean b) {
                         youTubePlayer.setFullscreenControlFlags(YouTubePlayer.FULLSCREEN_FLAG_CUSTOM_LAYOUT);
-                        youTubePlayer.cueVideo(youtubeId);
+                        youTubePlayer.loadVideo(youtubeId);
                         mYouTubePlayer = youTubePlayer;
                         youTubePlayer
                                 .setPlayerStateChangeListener(MainActivity.this);

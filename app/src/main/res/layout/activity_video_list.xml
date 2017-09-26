@@ -15,8 +15,12 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         tools:layout="@layout/list_fragment" />
-
+    <com.nhaarman.supertooltips.ToolTipRelativeLayout
+        android:id="@+id/activity_account_video_tooltipRelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <LinearLayout
+        android:id="@+id/buttonpickorrecord"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#eee"
@@ -57,6 +61,7 @@
             android:textAppearance="?android:textAppearanceLarge"
             android:textColorHint="#c00"
             android:textStyle="bold" />
+
     </LinearLayout>
 
 </LinearLayout>

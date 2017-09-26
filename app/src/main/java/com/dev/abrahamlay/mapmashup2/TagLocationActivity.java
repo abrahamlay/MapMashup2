@@ -22,10 +22,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.nhaarman.supertooltips.ToolTipView;
 
 import java.util.ArrayList;
 
-public class TagLocationActivity extends AppCompatActivity implements OnMapReadyCallback, AdapterView.OnItemSelectedListener, GoogleMap.OnMarkerDragListener, RatingBar.OnRatingBarChangeListener {
+public class TagLocationActivity extends AppCompatActivity implements OnMapReadyCallback, AdapterView.OnItemSelectedListener, GoogleMap.OnMarkerDragListener, RatingBar.OnRatingBarChangeListener, ToolTipView.OnToolTipViewClickedListener {
 
     private GoogleMap mMap;
     private GPSTracker gps;
@@ -48,6 +49,7 @@ public class TagLocationActivity extends AppCompatActivity implements OnMapReady
     private long kodeJenis;
     private RatingBar mBar;
     private float tagRating;
+    private ToolTipView myToolTipView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,8 +103,9 @@ public class TagLocationActivity extends AppCompatActivity implements OnMapReady
             longitude = gps.getLongitude();
 
             LatLng region = new LatLng(latitude, longitude);
-            Log.d(TAG,"Marker GPS pos :"+latitude+","+longitude);
-            MarkerOptions position=new MarkerOptions().position(region).draggable(true);
+            Log.d(TAG,"marker GPS pos :"+latitude+","+longitude);
+            MarkerOptions position=new MarkerOptions().position(region).draggable(true).title("Drag this marker to set tour place location");
+
             mMap.addMarker(position);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(region));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
@@ -160,12 +163,17 @@ public class TagLocationActivity extends AppCompatActivity implements OnMapReady
     public void onMarkerDragEnd(Marker marker) {
         longitude=marker.getPosition().longitude;
         latitude=marker.getPosition().latitude;
-        Toast.makeText(getApplicationContext(), "Marker Dragged to"+latitude+", "+longitude, Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "marker Dragged to"+latitude+", "+longitude, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
         Toast.makeText(getApplicationContext(), "Rating: "+mBar.getRating(), Toast.LENGTH_SHORT).show();
         tagRating=mBar.getRating();
+    }
+
+    @Override
+    public void onToolTipViewClicked(ToolTipView toolTipView) {
+
     }
 }

@@ -5,6 +5,7 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,9 +24,12 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
+import com.nhaarman.supertooltips.ToolTip;
+import com.nhaarman.supertooltips.ToolTipRelativeLayout;
+import com.nhaarman.supertooltips.ToolTipView;
 
 public class PlayActivity extends AppCompatActivity implements YouTubePlayer.PlayerStateChangeListener,
-        YouTubePlayer.OnFullscreenListener{
+        YouTubePlayer.OnFullscreenListener, ToolTipView.OnToolTipViewClickedListener {
 
     private static final String YOUTUBE_FRAGMENT_TAG = "youtube";
     final HttpTransport transport = AndroidHttp.newCompatibleTransport();
@@ -51,6 +55,7 @@ public class PlayActivity extends AppCompatActivity implements YouTubePlayer.Pla
     private double longitude;
     private long kodeJenis;
     private float tagRating;
+    private ToolTipView myToolTipView;
 
     public PlayActivity() {
     }
@@ -244,13 +249,26 @@ public class PlayActivity extends AppCompatActivity implements YouTubePlayer.Pla
         reviewJenis=(TextView) findViewById(R.id.reviewJenis);
         reviewLongitude=(TextView) findViewById(R.id.reviewLongitude);
         reviewLatitude=(TextView) findViewById(R.id.reviewLatitude);
+        ToolTipRelativeLayout toolTipRelativeLayout = (ToolTipRelativeLayout) findViewById(R.id.activity_play_tooltipRelativeLayout);
 
+        ToolTip toolTip = new ToolTip()
+                .withText("Tag a tour place location")
+                .withTextColor(ContextCompat.getColor(getApplicationContext(),R.color.text))
+                .withColor(ContextCompat.getColor(getApplicationContext(),R.color.bg_screen3))
+                .withAnimationType(ToolTip.AnimationType.FROM_TOP);
+        myToolTipView = toolTipRelativeLayout.showToolTipForView(toolTip, findViewById(R.id.reviewTagLocation));
+        myToolTipView.setOnToolTipViewClickedListener(PlayActivity.this);
     }
 
 
     public void tagLocation(View view) {
         Intent i=new Intent(this,TagLocationActivity.class);
         startActivityForResult(i , REQUEST_TAG_LOCATION);
+    }
+
+    @Override
+    public void onToolTipViewClicked(ToolTipView toolTipView) {
+
     }
 
     public interface Callbacks {

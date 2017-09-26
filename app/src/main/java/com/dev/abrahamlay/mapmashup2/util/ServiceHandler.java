@@ -95,7 +95,7 @@ public class ServiceHandler {
 
         for (int i=0;i<marker.size();i++) {
             LatLng region = new LatLng(marker.get(i).getLatitude(), marker.get(i).getLongitude());
-            Log.d(TAG, "Marker pos :" + marker.get(i).getLatitude()+ "," + marker.get(i).getLongitude());
+            Log.d(TAG, "marker pos :" + marker.get(i).getLatitude()+ "," + marker.get(i).getLongitude());
 
             Marker mMarker = mMap.addMarker(new MarkerOptions()
                     .position(region)

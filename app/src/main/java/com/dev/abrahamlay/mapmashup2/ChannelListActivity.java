@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -41,6 +42,9 @@ import com.google.api.services.youtube.model.Channel;
 import com.google.api.services.youtube.model.ChannelListResponse;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
+import com.nhaarman.supertooltips.ToolTip;
+import com.nhaarman.supertooltips.ToolTipRelativeLayout;
+import com.nhaarman.supertooltips.ToolTipView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,7 +53,7 @@ import java.util.List;
 
 import static com.dev.abrahamlay.mapmashup2.AccountVideoListActivity.ACCOUNT_KEY;
 
-public class ChannelListActivity extends AppCompatActivity implements View.OnClickListener {
+public class ChannelListActivity extends AppCompatActivity implements View.OnClickListener, ToolTipView.OnToolTipViewClickedListener {
 
     private static final int REQUEST_GOOGLE_PLAY_SERVICES = 0;
     private static final int REQUEST_GMS_ERROR_DIALOG = 1;
@@ -70,6 +74,7 @@ public class ChannelListActivity extends AppCompatActivity implements View.OnCli
     private ProgressDialog progress;
     private YouTube.Search.List query;
     private static final long NUMBER_OF_CHANNEL_RETURNED=25;
+    private ToolTipView myToolTipView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +97,15 @@ public class ChannelListActivity extends AppCompatActivity implements View.OnCli
         searchChannelInput=(EditText) findViewById(R.id.search_channel_input);
         searchChannelButton=(Button) findViewById(R.id.search_channel_button);
         channelFound = (ListView)findViewById(R.id.channel_found_list);
+        ToolTipRelativeLayout toolTipRelativeLayout = (ToolTipRelativeLayout) findViewById(R.id.activity_search_channel_tooltipRelativeLayout);
 
+        ToolTip toolTip = new ToolTip()
+                .withText("Search channel with keyword")
+                .withTextColor(ContextCompat.getColor(getApplicationContext(),R.color.text))
+                .withColor(ContextCompat.getColor(getApplicationContext(),R.color.bg_screen4))
+                .withAnimationType(ToolTip.AnimationType.FROM_TOP);
+        myToolTipView = toolTipRelativeLayout.showToolTipForView(toolTip, findViewById(R.id.search_channel_input));
+        myToolTipView.setOnToolTipViewClickedListener(ChannelListActivity.this);
 
         searchChannelButton.setOnClickListener(this);
 
@@ -331,5 +344,10 @@ public class ChannelListActivity extends AppCompatActivity implements View.OnCli
     private void chooseAccount() {
         startActivityForResult(credential.newChooseAccountIntent(),
                 REQUEST_ACCOUNT_PICKER);
+    }
+
+    @Override
+    public void onToolTipViewClicked(ToolTipView toolTipView) {
+
     }
 }
