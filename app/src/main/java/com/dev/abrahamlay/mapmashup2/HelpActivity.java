@@ -1,5 +1,6 @@
 package com.dev.abrahamlay.mapmashup2;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import com.dev.abrahamlay.mapmashup2.util.PrefManager;
 
 public class HelpActivity extends AppCompatActivity {
+    private static final int REQ_CODE = 123;
     private ViewPager viewPager;
     private MyViewPagerAdapter myViewPagerAdapter;
     private LinearLayout dotsLayout;
@@ -28,6 +30,8 @@ public class HelpActivity extends AppCompatActivity {
     private int[] layouts;
     private Button btnSkip, btnNext;
     private PrefManager prefManager;
+    private static String[] PERMISSIONS_CONTACT = {android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +42,8 @@ public class HelpActivity extends AppCompatActivity {
 //            finish();
 //        }
 
+
+//        checkPermissionLocation();
         // Making notification bar transparent
         if (Build.VERSION.SDK_INT >= 21) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
@@ -94,7 +100,29 @@ public class HelpActivity extends AppCompatActivity {
             }
         });
     }
-
+//    private void checkPermissionLocation(){
+//        if (ContextCompat.checkSelfPermission(HelpActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(HelpActivity.this, PERMISSIONS_CONTACT,REQ_CODE);
+//        }
+//    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//
+//        //Checking the request code of our request
+//        if(requestCode == REQ_CODE){
+//
+//            //If permission is granted
+//            if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+//
+//                //Displaying a toast
+//                Toast.makeText(this,"Permission granted now you can use your location",Toast.LENGTH_LONG).show();
+//            }else{
+//                //Displaying another toast if permission is not granted
+//                Toast.makeText(this,"Oops you just denied the permission",Toast.LENGTH_LONG).show();
+//            }
+//        }
+//    }
     private void addBottomDots(int currentPage) {
         dots = new TextView[layouts.length];
 

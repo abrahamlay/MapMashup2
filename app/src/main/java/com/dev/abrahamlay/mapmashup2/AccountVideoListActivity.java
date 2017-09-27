@@ -65,7 +65,7 @@ public class AccountVideoListActivity extends AppCompatActivity implements Uploa
     public static final String MESSAGE_KEY = "message";
     public static final String YOUTUBE_ID = "youtubeId";
     public static final String CHANNEL_ID = "channelId";
-
+    private static final int REQ_CODE=123;
     public static final String YOUTUBE_WATCH_URL_PREFIX = "http://www.youtube.com/watch?v=";
     static final String REQUEST_AUTHORIZATION_INTENT = "com.dev.abrahamlay.RequestAuth";
     static final String REQUEST_AUTHORIZATION_INTENT_PARAM = "com.google.example.yt.RequestAuth.param";
@@ -96,6 +96,8 @@ public class AccountVideoListActivity extends AppCompatActivity implements Uploa
         getWindow().requestFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
 
+//        checkPermissionContacts();
+
         mUploadsListFragment = new UploadsListFragment(getApplicationContext());
             setContentView(R.layout.activity_video_list);
             ensureLoader();
@@ -123,13 +125,30 @@ public class AccountVideoListActivity extends AppCompatActivity implements Uploa
         myToolTipView.setOnToolTipViewClickedListener(AccountVideoListActivity.this);
     }
 
-//    private void checkPermissionLocation(){
+//    private void checkPermissionContacts(){
 //        if (ContextCompat.checkSelfPermission(AccountVideoListActivity.this, Manifest.permission.GET_ACCOUNTS)
 //                != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(AccountVideoListActivity.this, REQUEST_ACCOUNT_PICKER,);
+//            ActivityCompat.requestPermissions(AccountVideoListActivity.this,new String[]{ Manifest.permission.GET_ACCOUNTS},REQ_CODE);
 //        }
 //    }
-
+//
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//
+//        //Checking the request code of our request
+//        if(requestCode == REQ_CODE){
+//
+//            //If permission is granted
+//            if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+//
+//                //Displaying a toast
+//                Toast.makeText(this,"Permission granted now you can read submit your youtube video",Toast.LENGTH_LONG).show();
+//            }else{
+//                //Displaying another toast if permission is not granted
+//                Toast.makeText(this,"Oops you just denied the permission",Toast.LENGTH_LONG).show();
+//            }
+//        }
+//    }
     @Override
     protected void onResume() {
         super.onResume();

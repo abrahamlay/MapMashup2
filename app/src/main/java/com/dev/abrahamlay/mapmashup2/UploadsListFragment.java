@@ -1,10 +1,14 @@
 package com.dev.abrahamlay.mapmashup2;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -35,6 +39,7 @@ import java.util.List;
  */
 public class UploadsListFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener, ToolTipView.OnToolTipViewClickedListener {
     private static final String TAG = UploadsListFragment.class.getName();
+    private static final int REQ_CODE = 123;
     private static Context mContext;
     private Callbacks mCallbacks;
     private GoogleApiClient mGoogleApiClient;
@@ -53,7 +58,7 @@ public class UploadsListFragment extends Fragment implements GoogleApiClient.Con
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        checkPermissionContacts();
         mGoogleApiClient = new GoogleApiClient.Builder(mContext)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -62,7 +67,29 @@ public class UploadsListFragment extends Fragment implements GoogleApiClient.Con
                 .build();
 
     }
+    private void checkPermissionContacts(){
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.GET_ACCOUNTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),new String[]{ Manifest.permission.GET_ACCOUNTS},REQ_CODE);
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
+        //Checking the request code of our request
+        if(requestCode == REQ_CODE){
+
+            //If permission is granted
+            if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+                //Displaying a toast
+                Toast.makeText(getContext(),"Permission granted now you can read submit your youtube video",Toast.LENGTH_LONG).show();
+            }else{
+                //Displaying another toast if permission is not granted
+                Toast.makeText(getContext(),"Oops you just denied the permission",Toast.LENGTH_LONG).show();
+            }
+        }
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -73,6 +100,7 @@ public class UploadsListFragment extends Fragment implements GoogleApiClient.Con
         mGridView.setEmptyView(emptyView);
         return listView;
     }
+
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {

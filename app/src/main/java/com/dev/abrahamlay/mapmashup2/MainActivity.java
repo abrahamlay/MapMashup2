@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity
         YouTubePlayer.OnFullscreenListener,
         ToolTipView.OnToolTipViewClickedListener,
         ActivityCompat.OnRequestPermissionsResultCallback{
+    private static final int REQ_CODE =123 ;
     //    ProgressDialog pDialog;
 //    String url = "http://abrahamlay.esy.es/mapmashupservice/getPlaceList.php";
     private GoogleMap mMap;
@@ -80,13 +81,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        checkPermissionLocation();
+
         // Checking for first time launch - before calling setContentView()
         prefManager = new PrefManager(this);
         if (prefManager.isFirstTimeLaunch()) {
             launchHelpScreen();
             finish();
         }
+        checkPermissionLocation();
         setContentView(R.layout.activity_main);
         mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mActionBarToolbar);
@@ -100,10 +102,46 @@ public class MainActivity extends AppCompatActivity
         allButton();
 
     }
+
     private void checkPermissionLocation(){
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
         != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, PERMISSIONS_CONTACT,REQUEST_INTERNET);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_INTERNET) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //start audio recording or whatever you planned to do
+            }else if (grantResults[0] == PackageManager.PERMISSION_DENIED){
+                if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    //Show an explanation to the user *asynchronously*
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("This permission is important to record audio.")
+                            .setTitle("Important permission required");
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_INTERNET);
+                        }
+                    });
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_INTERNET);
+                }else{
+                    //Never ask again and handle your app without permission.
+                }
+            }
+        }
+        else if (requestCode==REQ_CODE){
+            //If permission is granted
+            if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+                //Displaying a toast
+                Toast.makeText(this,"Permission granted now you can use your location",Toast.LENGTH_LONG).show();
+            }else{
+                //Displaying another toast if permission is not granted
+                Toast.makeText(this,"Oops you just denied the permission",Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -207,29 +245,7 @@ public class MainActivity extends AppCompatActivity
         myToolTipView.setOnToolTipViewClickedListener(MainActivity.this);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == REQUEST_INTERNET) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //start audio recording or whatever you planned to do
-            }else if (grantResults[0] == PackageManager.PERMISSION_DENIED){
-                if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    //Show an explanation to the user *asynchronously*
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage("This permission is important to record audio.")
-                            .setTitle("Important permission required");
-                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_INTERNET);
-                        }
-                    });
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_INTERNET);
-                }else{
-                    //Never ask again and handle your app without permission.
-                }
-            }
-        }
-    }
+
     @Override
     public void onClick(View v) {
 //        switch (v.getId()) {
@@ -403,7 +419,7 @@ public class MainActivity extends AppCompatActivity
             String youtubeID = service.getYouTubeID(marker.getId());
             String rating = service.getRating(marker.getId());
 
-//
+
             image=(NetworkImageView) view.findViewById(R.id.thumbnail);
             final TextView titleUi = (TextView) view.findViewById(R.id.titleMarker);
             final TextView snippetUi = (TextView) view.findViewById(R.id.snippetMarker);
